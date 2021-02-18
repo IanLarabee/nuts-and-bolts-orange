@@ -1,20 +1,4 @@
 <!doctype html>
-<?php
-    include("config/connect.php");
-    //Query whether the visitor has an id yet
-    if(!isset($_COOKIE["id"]))
-    {
-        $cookieName = "id";
-        $cookieValue = uniqid();
-        //Create cookie id using uniqid()
-        setcookie($cookieName, $cookieValue, time() + (86400 * 365), "/");
-        //Insert new column into ButtonTime
-        if (!mysqli_query($conn, "INSERT INTO buttontime(UserId, TimePressed) VALUES('$cookieValue', NULL)")){
-            echo "ID error: ". mysqli_error($conn);
-        }
-    }
-    mysqli_close($conn);
-?>
 <html lang="en">
     <head>
         <meta charset="utf-8">
