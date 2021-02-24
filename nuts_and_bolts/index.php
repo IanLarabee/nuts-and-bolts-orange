@@ -5,15 +5,25 @@
 </head>
 <body>
 
-<div class="container">
-    <h1>Nuts and Bolts</h1>
-
-    <nav id="nav">
-        <a href="index.php" class="left">Home</a>
-        <a href="products.php" class="left">Products</a>
-        <a href="faq.php" class="left">FAQ</a>
-        <a href="contact.php" class="left">Contact Us</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class = "container">
+            <a class="navbar-brand" href="#">Nuts and Bolts</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+                    <a class="nav-link" href="products.php">Products</a>
+                    <a class="nav-link" href="faq.php">FAQ</a>
+                    <a class="nav-link" href="contact.php">Contact Us</a>
+                </div>
+            </div>
+        </div>
     </nav>
-</div>
+    
+    <div class="container">
+        <h1>Nuts and Bolts</h1>
+    </div>
 
 <?php require_once "include/footer.php"; ?>
