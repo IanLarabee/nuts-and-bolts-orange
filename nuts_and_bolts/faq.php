@@ -33,8 +33,8 @@
 
 			<h2>Our Story</h2>
 			<p>Founded in 1976, Nuts and Bolts was a product of hard work paying off during hard times. Nuts and Bolts merely started as a dream until store founder and former veteran James Augustus Deathblade was able to make it a reality. 
-			In his mid thirties working as a bartender and fixing his friends' motorcycles at the local VA by day, Deathblade loved working with his hands but ends weren't meeting; he needed a change. 
-			Over the course of five long years, James pooled together what he could and was finally able to launch Nuts and Bolts and hasn't looked back since. Nuts and Bolts keeps prices low so that everyone has a chance to work with their hands!</p>
+			In his mid-thirties working as a bartender and fixing his friends' motorcycles at the local VA by day, Deathblade loved working with his hands but ends weren't meeting; he needed a change. 
+			Over the course of five long years, James pooled together what he could and was finally able to launch Nuts and Bolts and hasn't looked back since. Nuts and Bolts keeps prices low so that everyone has a chance to get their job done!</p>
 
 			<!--
 			<h2>(FAQ)	How long does it typically take to replinsh an out of stock item?</h2>
