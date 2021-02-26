@@ -17,6 +17,7 @@
                         <a class="nav-link" href="products.php">Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
+                        <a class="nav-link" href="inventory.php">Inventory</a>
                     </div>
                 </div>
             </div>
