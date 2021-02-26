@@ -27,3 +27,15 @@ h1{
     line-height: 20px;
     background-color: #f5f5f5;
 }
+
+#inventory {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#inventory th, td {
+    padding-left: 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+    
+}
