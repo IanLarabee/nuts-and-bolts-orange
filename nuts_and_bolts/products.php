@@ -1,6 +1,7 @@
 <?php require_once "include/header.php"; ?>
+<?php require_once "config/connect.php" ?>
 
-        <title>Products | Nuts and Bolts</title>
+    <title>Products | Nuts and Bolts</title>
     </head>
     <body>
         
@@ -16,7 +17,6 @@
                         <a class="nav-link active" href="products.php">Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
-                        <a class="nav-link" href="inventory.php">Inventory</a>
                     </div>
                 </div>
             </div>
@@ -24,7 +24,34 @@
 
         <div class = "container">
             <h1>Products</h1>
+
             <div class = "container">
+
+            <?php $result = mysqli_query($conn, "SELECT * FROM inventory"); ?>
+
+            <table id="inventory">
+            <tr>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th>Description</th>
+            <th>Price</th>
+            </tr>
+    
+            <?php 
+            while($row = mysqli_fetch_array($result))
+            {
+            echo "<tr>";
+            echo "<td>" . $row['product_name'] . "</td>";
+            echo "<td>" . $row['sku'] . "</td>";
+            echo "<td>" . $row['description'] . "</td>";
+            echo "<td>" . $row['price'] . "</td>";
+            echo "</tr>";
+            }
+            echo "</table>";
+    
+            mysqli_close($conn);
+            ?>
+                <!--
                 <div class = "row row-cols-1 row-cols-md-4 g-3">
                     
                     <div class = "col">
@@ -121,7 +148,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>  
         </div>
 
