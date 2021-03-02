@@ -22,7 +22,7 @@
         }
 
         if(empty($_POST['sku'])) {
-            $errors['sku'] = 'A product sku is required';
+            $errors['sku'] = 'A product SKU is required';
         } else {
             $sku = $_POST['sku'];
             if(!preg_match('/^[0-9A-Z]{1,12}$/', $sku)){
@@ -46,7 +46,7 @@
         } else {
             $price = $_POST['price'];
             if(!is_numeric($price)){
-                $errors['price'] = 'The product price is must be of numeric values';
+                $errors['price'] = 'The product price must be a numeric value';
             }
         }
 
@@ -56,13 +56,16 @@
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
 
-            $sql;//TODO: Add SQL statement to insert values into inventory
+            $sql = "INSERT INTO inventory(product_name, sku, description, price) VALUES('$name', '$sku', '$desc', '$price')";//TODO: Add SQL statement to insert values into inventory
 
             if(mysqli_query($conn, $sql)) {
-                $_SESSION['success'] = htmlspecialchars($name)." was successfully added to the inventory!";
+                $_SESSION['postStatus'] = true;
+                $_SESSION['name'] = htmlspecialchars($name);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
                 exit;
             }
+        } else {
+            $_SESSION['postStatus'] = false;
         }
     }
 ?>
@@ -71,7 +74,6 @@
         <title>Home | Nuts and Bolts</title>
 
     </head>
-    <!-- The input fields allow the user to add a product name, product SKU, a description, and a price-->
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -94,50 +96,65 @@
         
         <div class="container">
             <h1>Add Products</h1>
-            <!-- Form Submissions will be here-->
-            <form action="add.php" method="POST">
-                <!-- Product Name-->
-                <div class="form-group col-md-4 mx-5">
-                    <label for="productName" class="form-label">Product Name</label>
-                    <input type ="text" class="form-control" id="productName" name ="name" value = "<?php echo htmlspecialchars($name) ?>">
-                    <p class="text-danger">
-                        <?php echo $errors['name'] ?>
-                    </p>
-                </div>
-                <!-- Product SKU-->
-                <div class="form-group col-md-5 mx-5">
-                    <label for="productSKU" class="form-label">SKU</label>
-                    <input type ="text" class="form-control" id="productSKU" name ="sku" value = "<?php echo htmlspecialchars($sku) ?>">
-                    <p class="text-danger">
-                        <?php echo $errors['sku'] ?>
-                    </p>
-                </div>
-                <!-- Product Description-->
-                <div class="form-group col-md-8 mx-5">
-                    <label for="productDescription" class="form-label">Description</label>
-                    <textarea class="form-control" id="productDescription" name="desc" value="<?php echo htmlspecialchars($desc) ?>"></textarea>
-                    <p class="text-danger">
-                        <?php echo $errors['desc'] ?>
-                    </p>
-                </div>
-                <!-- Price-->
-                <div class="form-group col-md-1 mx-5">
-                    <label for="productPrice" class="form-label">Price</label>
-                    <input type="text" class="form-control" id="productPrice" name="price" value="<?php echo htmlspecialchars($price) ?>">
-                    <p class="text-danger">
-                        <?php echo $errors['price'] ?>
-                    </p>
-                </div>
-                <button class="btn btn-primary" type="submit" name="submit">Submit</button>
-            </form>
-            <p class="text-success">
-                <?php                
-                    if(isset($_SESSION['success'])) {
-                        echo $_SESSION['success'];
-                        unset($_SESSION['success']);
-                    }
-                ?>
-            </p>
+            <div class="container bg-light text-dark">
+                <form class="row g-3" action="add.php" method="POST">
+                    <div class="form-group col-12">
+                        <label for="productName" class="form-label">Product Name:</label>
+                        <input type ="text" class="form-control" id="productName" name ="name" value = "<?php echo htmlspecialchars($name); ?>">
+                        <p class="text-danger">
+                            <?php echo $errors['name']; ?>
+                        </p>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="productSKU" class="form-label">SKU:</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">#</span>
+                            <input type ="text" class="form-control" id="productSKU" name ="sku" value = "<?php echo htmlspecialchars($sku); ?>">
+                        </div>
+                        <p class="text-danger">
+                            <?php echo $errors['sku']; ?>
+                        </p>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="productPrice" class="form-label">Price:</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">$ </span>
+                            <input type="text" class="form-control" id="productPrice" name="price" value="<?php echo htmlspecialchars($price); ?>">
+                        </div>
+                        <p class="text-danger">
+                            <?php echo $errors['price']; ?>
+                        </p>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="productDescription" class="form-label">Description:</label>
+                        <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"><?php echo htmlspecialchars($desc); ?></textarea>
+                        <p class="text-danger">
+                            <?php echo $errors['desc']; ?>
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" type="submit" name="submit">Submit</button>
+                    
+                    <?php                
+                        if(isset($_SESSION['postStatus']) && $_SESSION['postStatus']) {
+                    ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <?php echo $_SESSION['name']; ?> was added successfully to the inventory!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php
+                        } elseif(isset($_SESSION['postStatus']) && !$_SESSION['postStatus']) {
+                    ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <?php if($name =='') { echo 'This item';}else{ echo htmlspecialchars($name);} ?> could not be added to the inventory due to an error.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php
+                        }
+                        unset($_SESSION['postStatus']);
+                        unset($_SESSION['name']);
+                    ?>
+                </form>
+            </div>
         </div>
-
+    
 <?php require_once "include/footer.php"; ?>
