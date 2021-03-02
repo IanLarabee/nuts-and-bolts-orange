@@ -56,7 +56,7 @@
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
 
-            $sql = "INSERT INTO inventory(product_name, sku, description, price) VALUES('$name', '$sku', '$desc', '$price')";//TODO: Add SQL statement to insert values into inventory
+            $sql = "INSERT INTO inventory(product_name, sku, description, price) VALUES('$name', '$sku', '$desc', '$price')";
 
             if(mysqli_query($conn, $sql)) {
                 $_SESSION['postStatus'] = true;
