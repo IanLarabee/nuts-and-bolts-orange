@@ -15,6 +15,7 @@
 					<div class="navbar-nav">
 						<a class="nav-link" aria-current="page" href="index.php">Home</a>
 						<a class="nav-link" href="products.php">Products</a>
+						<a class="nav-link" href="add.php">Add Products</a>
 						<a class="nav-link active" href="faq.php">FAQ</a>
 						<a class="nav-link" href="contact.php">Contact Us</a>
 					</div>
