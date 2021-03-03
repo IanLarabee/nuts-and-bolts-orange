@@ -13,10 +13,11 @@
 				</button>
 				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 					<div class="navbar-nav">
-						<a class="nav-link" aria-current="page" href="index.php">Home</a>
+						<a class="nav-link" href="index.php">Home</a>
 						<a class="nav-link" href="products.php">Products</a>
 						<a class="nav-link" href="add.php">Add Products</a>
-						<a class="nav-link active" href="faq.php">FAQ</a>
+						<a class="nav-link" href="update.php">Update Products</a>
+						<a class="nav-link active" aria-current="page" href="faq.php">FAQ</a>
 						<a class="nav-link" href="contact.php">Contact Us</a>
 					</div>
 				</div>

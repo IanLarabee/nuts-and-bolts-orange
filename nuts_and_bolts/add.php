@@ -62,6 +62,7 @@
                 $_SESSION['postStatus'] = true;
                 $_SESSION['name'] = htmlspecialchars($name);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
+                mysqli_close($conn);
                 exit;
             }
         } else {
@@ -71,7 +72,7 @@
 ?>
 <?php require_once "include/header.php"; ?>
 
-        <title>Home | Nuts and Bolts</title>
+        <title>Add Products | Nuts and Bolts</title>
 
     </head>
     <body>
@@ -84,9 +85,10 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link" aria-current="page" href="index.php">Home</a>
+                        <a class="nav-link" href="index.php">Home</a>
                         <a class="nav-link" href="products.php">Products</a>
                         <a class="nav-link active" aria-current="page" href="add.php">Add Products</a>
+                        <a class="nav-link" href="update.php">Update Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
                     </div>
