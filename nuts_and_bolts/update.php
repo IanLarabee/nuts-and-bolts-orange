@@ -156,7 +156,7 @@
                         }
                     ?>
                     <?php                
-                        if(isset($_POST['find']) || $row != null) {
+                        if(isset($_POST['find']) && $row != null) {
                     ?>
                         <div class="form-group col-md-6">
                             <label for="productPrice" class="form-label">Price:</label>
