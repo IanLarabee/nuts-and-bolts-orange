@@ -1,16 +1,21 @@
 <?php
     require_once "config/connect.php";
 
+    session_unset();
     session_start();
 
     $name = '';
     $sku = '';
     $desc = '';
     $price = '';
+    $selectSKU = '';
+    $result = mysqli_query($conn, "SELECT * FROM inventory LIMIT 0,0");
+    $rows = array();
 
     $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'');
 
     if(isset($_POST['select'])) {
+        $selectSKU = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM inventory WHERE sku='".$_POST['select']."'"))['sku'];
         echo json_encode(mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM inventory WHERE sku='".$_POST['select']."'")));
         exit();
     }
@@ -22,6 +27,7 @@
         $result = mysqli_query($conn, "SELECT * FROM inventory WHERE product_name='$name' OR sku='$sku'");
 
         if(mysqli_num_rows($result) > 0) {
+            
             while($row = mysqli_fetch_assoc($result)) {
                 $rows[] = $row;
             }
@@ -32,8 +38,6 @@
                 $desc = $rows[0]['description'];
                 $price = $rows[0]['price'];
             }
-        } else {
-            $_SESSION['postStatus'] = false;
         }
     }
 
@@ -53,7 +57,7 @@
             $sku = $_POST['sku'];
             if(!preg_match('/^[0-9A-Z]{1,12}$/', $sku)){
                 $errors['sku'] = 'The product SKU must be no longer than 12 capital alphanumeric characters';
-            } else if(mysqli_fetch_assoc(mysqli_query($conn, "SELECT sku FROM inventory WHERE sku='$sku'"))["sku"] == $sku){
+            } else if(mysqli_fetch_assoc(mysqli_query($conn, "SELECT sku FROM inventory WHERE sku='$sku'"))["sku"] == $sku && $selectSKU != $sku){
                 $errors['sku'] = 'This SKU already exists';
             }
         }
@@ -85,14 +89,14 @@
             $sql = "UPDATE inventory SET product_name='$name', sku='$sku', description='$desc', price='$price' WHERE sku='$sku'";
 
             if(mysqli_query($conn, $sql)) {
-                $_SESSION['postStatus'] = true;
+                $_SESSION['updateStatus'] = true;
                 $_SESSION['name'] = htmlspecialchars($name);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
                 mysqli_close($conn);
                 exit();
             }
         } else {
-            $_SESSION['postStatus'] = false;
+            $_SESSION['updateStatus'] = false;
         }
     }
 ?>
@@ -145,6 +149,7 @@
             <h1 id="testh1">Update Products</h1>
             <div class="container bg-light text-dark">
                 <form class="row g-3" action="update.php" method="POST">
+                   
                     <div class="form-group col-12">
                         <label for="productName" class="form-label">Product Name:</label>
                         <input type ="text" class="form-control" id="productName" name ="name" value="<?php echo htmlspecialchars($name); ?>">
@@ -152,7 +157,8 @@
                             <?php echo $errors['name']; ?>
                         </p>
                     </div>
-                    <div class="form-group <?php if(!isset($_POST['find']) || mysqli_num_rows($result) < 1) { echo "col-12";} else { echo "col-md-6";}?>">
+                    
+                    <div class="form-group <?php if(mysqli_num_rows($result) == 0) { echo "col-12";} else { echo "col-md-6";}?>">
                         <label for="productSKU" class="form-label">SKU:</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text">#</span>
@@ -162,12 +168,15 @@
                             <?php echo $errors['sku']; ?>
                         </p>
                     </div>
+                    
                     <?php                
-                        if(!isset($_POST['find']) || mysqli_num_rows($result) < 1) {
+                        if(mysqli_num_rows($result) == 0) {
                     ?>
+                        
                         <button class="btn btn-primary" type="submit" name="find">Find Product</button>
+                        
                         <?php
-                            if(isset($_SESSION['postStatus']) && !$_SESSION['postStatus']) {
+                            if(isset($_POST['find']) && mysqli_num_rows($result) == 0) {
                         ?>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <?php if($name =='') { echo 'This item';}else{ echo htmlspecialchars($name);} ?> could not be found.
@@ -175,14 +184,16 @@
                             </div>
                         <?php
                             }
-                            unset($_SESSION['postStatus']);
                         ?>
+                    
                     <?php
                         }
                     ?>
+                    
                     <?php                
-                        if(isset($_POST['find']) && mysqli_num_rows($result) > 0) {
+                        if(mysqli_num_rows($result) > 0 || (isset($_SESSION['updateStatus']) && !$_SESSION['updateStatus'])) {
                     ?>
+                        
                         <div class="form-group col-md-6">
                             <label for="productPrice" class="form-label">Price:</label>
                             <div class="input-group mb-3">
@@ -193,6 +204,7 @@
                                 <?php echo $errors['price']; ?>
                             </p>
                         </div>
+                        
                         <div class="form-group col-12">
                             <label for="productDescription" class="form-label">Description:</label>
                             <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"><?php echo htmlspecialchars($desc); ?></textarea>
@@ -200,10 +212,12 @@
                                 <?php echo $errors['desc']; ?>
                             </p>
                         </div>
+                        
                         <?php                
-                            if(count($rows) > 1) {
+                            if(count($rows) > 1 && !isset($_POST['update'])) {
                         ?>
                             <h5>Mutiple entries exist (Please select one):</h5>
+                            
                             <table id="inventory">
                             <tr>
                             <th>Product Name</th>
@@ -212,42 +226,48 @@
                             <th>Price</th>
                             </tr>
 
-                        <?php 
-                           for($item = 0; $item < count($rows); $item++) {
-                            echo "<tr>";
-                            echo "<td>" . $rows[$item]['product_name'] . "</td>";
-                            echo "<td>" . $rows[$item]['sku'] . "</td>";
-                            echo "<td>" . $rows[$item]['description'] . "</td>";
-                            echo "<td>$" . $rows[$item]['price'] . "</td>";
-                            echo "<td><button class='btn btn-primary select' type='button' value='".$rows[$item]['sku']."'>Select</button></td>";
-                            echo "</tr>";
-                           }
-                            echo "</table>";
-                        ?>
+                            <?php 
+                            for($item = 0; $item < count($rows); $item++) {
+                                echo "<tr>";
+                                echo "<td>" . $rows[$item]['product_name'] . "</td>";
+                                echo "<td>" . $rows[$item]['sku'] . "</td>";
+                                echo "<td>" . $rows[$item]['description'] . "</td>";
+                                echo "<td>$" . $rows[$item]['price'] . "</td>";
+                                echo "<td><button class='btn btn-primary select' type='button' value='".$rows[$item]['sku']."'>Select</button></td>";
+                                echo "</tr>";
+                            }
+                                echo "</table>";
+                            ?>
                         <?php
                             }
                         ?>
+
                         <button class="btn btn-primary" type="submit" name="update">Update</button>
                         
                         <?php                
-                            if(isset($_SESSION['postStatus']) && $_SESSION['postStatus']) {
+                            if(isset($_SESSION['updateStatus']) && $_SESSION['updateStatus']) {
                         ?>
+                            
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                 <?php echo $_SESSION['name']; ?> was updated successfully!
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
+                        
                         <?php
-                            } elseif(isset($_SESSION['postStatus']) && !$_SESSION['postStatus']) {
+                            } elseif(isset($_SESSION['updateStatus']) && !$_SESSION['updateStatus']) {
                         ?>
+                            
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <?php if($name =='') { echo 'This item';}else{ echo htmlspecialchars($name);} ?> could not be updated due to an error.
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
+                        
                         <?php
                             }
-                            unset($_SESSION['postStatus']);
+                            unset($_SESSION['updateStatus']);
                             unset($_SESSION['name']);
                         ?>
+                    
                     <?php
                         }
                     ?>
