@@ -147,7 +147,7 @@
                 <form class="row g-3" action="update.php" method="POST">
                     <div class="form-group col-12">
                         <label for="productName" class="form-label">Product Name:</label>
-                        <input type ="text" class="form-control" id="productName" name ="name">
+                        <input type ="text" class="form-control" id="productName" name ="name" value="<?php echo htmlspecialchars($name); ?>">
                         <p class="text-danger">
                             <?php echo $errors['name']; ?>
                         </p>
@@ -187,7 +187,7 @@
                             <label for="productPrice" class="form-label">Price:</label>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">$ </span>
-                                <input type="text" class="form-control" id="productPrice" name="price">
+                                <input type="text" class="form-control" id="productPrice" name="price" value="<?php echo htmlspecialchars($price); ?>">
                             </div>
                             <p class="text-danger">
                                 <?php echo $errors['price']; ?>
@@ -195,7 +195,7 @@
                         </div>
                         <div class="form-group col-12">
                             <label for="productDescription" class="form-label">Description:</label>
-                            <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"></textarea>
+                            <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"><?php echo htmlspecialchars($desc); ?></textarea>
                             <p class="text-danger">
                                 <?php echo $errors['desc']; ?>
                             </p>
