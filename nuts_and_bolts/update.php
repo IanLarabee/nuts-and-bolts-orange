@@ -7,24 +7,30 @@
     $sku = '';
     $desc = '';
     $price = '';
-    $row = null;
 
     $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'');
+
+    if(isset($_POST['select'])) {
+        echo json_encode(mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM inventory WHERE sku='".$_POST['select']."'")));
+        exit();
+    }
 
     if(isset($_POST['find'])) {
         $name = mysqli_real_escape_string($conn, $_POST['name']);
         $sku = mysqli_real_escape_string($conn, $_POST['sku']);
 
         $result = mysqli_query($conn, "SELECT * FROM inventory WHERE product_name='$name' OR sku='$sku'");
-        $row = mysqli_fetch_array($result);
 
-        if($row != null) {
-            $_SESSION['postStatus'] = true;
-            if(count($row) < 2) {
-                $name = $row['product_name'];
-                $sku = $row['sku'];
-                $desc = $row['description'];
-                $price = $row['price'];
+        if(mysqli_num_rows($result) > 0) {
+            while($row = mysqli_fetch_assoc($result)) {
+                $rows[] = $row;
+            }
+
+            if(count($rows) == 1) {
+                $name = $rows[0]['product_name'];
+                $sku = $rows[0]['sku'];
+                $desc = $rows[0]['description'];
+                $price = $rows[0]['price'];
             }
         } else {
             $_SESSION['postStatus'] = false;
@@ -83,7 +89,7 @@
                 $_SESSION['name'] = htmlspecialchars($name);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
                 mysqli_close($conn);
-                exit;
+                exit();
             }
         } else {
             $_SESSION['postStatus'] = false;
@@ -91,6 +97,25 @@
     }
 ?>
 <?php require_once "include/header.php"; ?>
+        
+        <script>
+            $(document).ready(function(){
+                $("button[class='btn btn-primary select']").click(function(){
+                    $.ajax({
+                        type: 'post',
+                        context: this,
+                        data: {select: $(this).val()},
+                        success: function(response){
+                            var row = jQuery.parseJSON(response);
+                            $("#productName").val(row.product_name);
+                            $("#productSKU").val(row.sku);
+                            $("#productPrice").val(row.price);
+                            $("#productDescription").text(row.description);
+                        }
+                    });
+                });
+            });
+        </script>
 
         <title>Update Products | Nuts and Bolts</title>
 
@@ -117,28 +142,28 @@
         </nav>
         
         <div class="container">
-            <h1>Update Products</h1>
+            <h1 id="testh1">Update Products</h1>
             <div class="container bg-light text-dark">
                 <form class="row g-3" action="update.php" method="POST">
                     <div class="form-group col-12">
                         <label for="productName" class="form-label">Product Name:</label>
-                        <input type ="text" class="form-control" id="productName" name ="name" value = "<?php echo htmlspecialchars($name); ?>">
+                        <input type ="text" class="form-control" id="productName" name ="name">
                         <p class="text-danger">
                             <?php echo $errors['name']; ?>
                         </p>
                     </div>
-                    <div class="form-group <?php if(!isset($_POST['find']) || $row == null) { echo "col-12";} else { echo "col-md-6";}?>">
+                    <div class="form-group <?php if(!isset($_POST['find']) || mysqli_num_rows($result) < 1) { echo "col-12";} else { echo "col-md-6";}?>">
                         <label for="productSKU" class="form-label">SKU:</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text">#</span>
-                            <input type ="text" class="form-control" id="productSKU" name ="sku" value = "<?php echo htmlspecialchars($sku); ?>">
+                            <input type ="text" class="form-control" id="productSKU" name ="sku" value="<?php echo htmlspecialchars($sku); ?>">
                         </div>
                         <p class="text-danger">
                             <?php echo $errors['sku']; ?>
                         </p>
                     </div>
                     <?php                
-                        if(!isset($_POST['find']) || $row == null) {
+                        if(!isset($_POST['find']) || mysqli_num_rows($result) < 1) {
                     ?>
                         <button class="btn btn-primary" type="submit" name="find">Find Product</button>
                         <?php
@@ -156,13 +181,13 @@
                         }
                     ?>
                     <?php                
-                        if(isset($_POST['find']) && $row != null) {
+                        if(isset($_POST['find']) && mysqli_num_rows($result) > 0) {
                     ?>
                         <div class="form-group col-md-6">
                             <label for="productPrice" class="form-label">Price:</label>
                             <div class="input-group mb-3">
                                 <span class="input-group-text">$ </span>
-                                <input type="text" class="form-control" id="productPrice" name="price" value="<?php echo htmlspecialchars($price); ?>">
+                                <input type="text" class="form-control" id="productPrice" name="price">
                             </div>
                             <p class="text-danger">
                                 <?php echo $errors['price']; ?>
@@ -170,36 +195,35 @@
                         </div>
                         <div class="form-group col-12">
                             <label for="productDescription" class="form-label">Description:</label>
-                            <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"><?php echo htmlspecialchars($desc); ?></textarea>
+                            <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"></textarea>
                             <p class="text-danger">
                                 <?php echo $errors['desc']; ?>
                             </p>
                         </div>
                         <?php                
-                            if(count($row) > 1) {
+                            if(count($rows) > 1) {
                         ?>
+                            <h5>Mutiple entries exist (Please select one):</h5>
                             <table id="inventory">
                             <tr>
                             <th>Product Name</th>
                             <th>SKU</th>
                             <th>Description</th>
                             <th>Price</th>
-                            <th>Select</th>
                             </tr>
 
-                            <?php 
-                                while($row)
-                                {
-                                    echo "<tr>";
-                                    echo "<td>" . $row['product_name'] . "</td>";
-                                    echo "<td>" . $row['sku'] . "</td>";
-                                    echo "<td>" . $row['description'] . "</td>";
-                                    echo "<td>" . $row['price'] . "</td>";
-                                    echo "<td><button class='btn btn-primary' type='submit' name='".$row['sku']."'>Select</button></td>";
-                                    echo "</tr>";
-                                }
-                                echo "</table>";
-                            ?>
+                        <?php 
+                           for($item = 0; $item < count($rows); $item++) {
+                            echo "<tr>";
+                            echo "<td>" . $rows[$item]['product_name'] . "</td>";
+                            echo "<td>" . $rows[$item]['sku'] . "</td>";
+                            echo "<td>" . $rows[$item]['description'] . "</td>";
+                            echo "<td>$" . $rows[$item]['price'] . "</td>";
+                            echo "<td><button class='btn btn-primary select' type='button' value='".$rows[$item]['sku']."'>Select</button></td>";
+                            echo "</tr>";
+                           }
+                            echo "</table>";
+                        ?>
                         <?php
                             }
                         ?>
