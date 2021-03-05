@@ -1,8 +1,16 @@
 <?php
     require_once "config/connect.php";
 
-    session_unset();
     session_start();
+
+    function searchForSKU($id, $array) {
+        foreach ($array as $key => $val) {
+            if ($val['sku'] === $id) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     $name = '';
     $sku = '';
@@ -13,9 +21,9 @@
     $rows = array();
 
     $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'');
+    
 
     if(isset($_POST['select'])) {
-        $selectSKU = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM inventory WHERE sku='".$_POST['select']."'"))['sku'];
         echo json_encode(mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM inventory WHERE sku='".$_POST['select']."'")));
         exit();
     }
@@ -57,7 +65,7 @@
             $sku = $_POST['sku'];
             if(!preg_match('/^[0-9A-Z]{1,12}$/', $sku)){
                 $errors['sku'] = 'The product SKU must be no longer than 12 capital alphanumeric characters';
-            } else if(mysqli_fetch_assoc(mysqli_query($conn, "SELECT sku FROM inventory WHERE sku='$sku'"))["sku"] == $sku && $selectSKU != $sku){
+            } else if(mysqli_fetch_assoc(mysqli_query($conn, "SELECT sku FROM inventory WHERE sku='$sku'"))["sku"] == $sku && searchForSKU($sku, $rows)){
                 $errors['sku'] = 'This SKU already exists';
             }
         }
@@ -90,7 +98,6 @@
 
             if(mysqli_query($conn, $sql)) {
                 $_SESSION['updateStatus'] = true;
-                $_SESSION['name'] = htmlspecialchars($name);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
                 mysqli_close($conn);
                 exit();
@@ -158,7 +165,7 @@
                         </p>
                     </div>
                     
-                    <div class="form-group <?php if(mysqli_num_rows($result) == 0) { echo "col-12";} else { echo "col-md-6";}?>">
+                    <div class="form-group <?php if(mysqli_num_rows($result) == 0 && !isset($_POST['update'])) { echo "col-12";} else { echo "col-md-6";}?>">
                         <label for="productSKU" class="form-label">SKU:</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text">#</span>
@@ -168,9 +175,9 @@
                             <?php echo $errors['sku']; ?>
                         </p>
                     </div>
-                    
+
                     <?php                
-                        if(mysqli_num_rows($result) == 0) {
+                        if(mysqli_num_rows($result) == 0 && !isset($_POST['update'])) {
                     ?>
                         
                         <button class="btn btn-primary" type="submit" name="find">Find Product</button>
@@ -244,17 +251,8 @@
 
                         <button class="btn btn-primary" type="submit" name="update">Update</button>
                         
-                        <?php                
-                            if(isset($_SESSION['updateStatus']) && $_SESSION['updateStatus']) {
-                        ?>
-                            
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <?php echo $_SESSION['name']; ?> was updated successfully!
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        
                         <?php
-                            } elseif(isset($_SESSION['updateStatus']) && !$_SESSION['updateStatus']) {
+                            if(isset($_SESSION['updateStatus']) && !$_SESSION['updateStatus']) {
                         ?>
                             
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -265,10 +263,20 @@
                         <?php
                             }
                             unset($_SESSION['updateStatus']);
-                            unset($_SESSION['name']);
                         ?>
                     
                     <?php
+                        }              
+                        if(isset($_SESSION['updateStatus']) && $_SESSION['updateStatus']) {
+                    ?>
+                        
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            Item was updated successfully!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    
+                    <?php
+                        unset($_SESSION['updateStatus']);
                         }
                     ?>
                 </form>
