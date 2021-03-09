@@ -147,6 +147,7 @@
                         <a class="nav-link active" aria-current="page" href="update.php">Update Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
+                        <a class="nav-link" href="register.php">Register Employee</a>
                     </div>
                 </div>
             </div>
