@@ -78,10 +78,10 @@
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class = "container">
+            <div class="container">
                 <a class="navbar-brand" href="index.php">Nuts and Bolts</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
@@ -91,7 +91,11 @@
                         <a class="nav-link" href="update.php">Update Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
-                        <a class="nav-link" href="register.php">Register Employee</a>
+                    </div>
+                    <div class="navbar-nav ms-auto flex-nowrap">
+                        <a class="nav-link" href="register.php">Register</a>
+                        <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+                        <a class="nav-link" href="#">Login</a>
                     </div>
                 </div>
             </div>
@@ -104,9 +108,9 @@
                     <div class="form-group col-12">
                         <label for="productName" class="form-label">Product Name:</label>
                         <input type ="text" class="form-control" id="productName" name ="name" value = "<?php echo htmlspecialchars($name); ?>">
-                        <p class="text-danger">
+                        <span class="text-danger">
                             <?php echo $errors['name']; ?>
-                        </p>
+                        </span>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="productSKU" class="form-label">SKU:</label>
@@ -114,9 +118,9 @@
                             <span class="input-group-text">#</span>
                             <input type ="text" class="form-control" id="productSKU" name ="sku" value = "<?php echo htmlspecialchars($sku); ?>">
                         </div>
-                        <p class="text-danger">
+                        <span class="text-danger">
                             <?php echo $errors['sku']; ?>
-                        </p>
+                        </span>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="productPrice" class="form-label">Price:</label>
@@ -124,16 +128,16 @@
                             <span class="input-group-text">$ </span>
                             <input type="text" class="form-control" id="productPrice" name="price" value="<?php echo htmlspecialchars($price); ?>">
                         </div>
-                        <p class="text-danger">
+                        <span class="text-danger">
                             <?php echo $errors['price']; ?>
-                        </p>
+                        </span>
                     </div>
                     <div class="form-group col-12">
                         <label for="productDescription" class="form-label">Description:</label>
                         <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"><?php echo htmlspecialchars($desc); ?></textarea>
-                        <p class="text-danger">
+                        <span class="text-danger">
                             <?php echo $errors['desc']; ?>
-                        </p>
+                        </span>
                     </div>
                     <button class="btn btn-primary" type="submit" name="submit">Submit</button>
                     

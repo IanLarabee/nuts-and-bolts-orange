@@ -106,11 +106,12 @@
 </head>
 
 <body>
+    
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class = "container">
+        <div class="container">
             <a class="navbar-brand" href="index.php">Nuts and Bolts</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
@@ -120,19 +121,15 @@
                     <a class="nav-link" href="update.php">Update Products</a>
                     <a class="nav-link" href="faq.php">FAQ</a>
                     <a class="nav-link" href="contact.php">Contact Us</a>
-                    <a class="nav-link active" aria-current="page" href="register.php">Register Employee</a>
+                </div>
+                <div class="navbar-nav ms-auto flex-nowrap">
+                    <a class="nav-link active" aria-current="page" href="register.php">Register</a>
+                    <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+                    <a class="nav-link" href="#">Login</a>
                 </div>
             </div>
         </div>
     </nav>
-
-    <?php if(array_filter($errors)): ?>
-        <?php foreach ($errors as $error): ?>
-            <ul class="errors">
-                <li><?=$error?></li>
-            </ul>
-        <?php endforeach; ?>
-    <?php endif; ?>
 
     <!-- This is the Register Employee form-->
     <div class="container">
@@ -144,36 +141,49 @@
                 <div class="form-group col-md-6">
                     <label for="firstName" class="form-label">First Name:</label>
                     <input type="text" class="form-control" name="firstName" id="firstName" value = "<?php echo htmlspecialchars($firstName); ?>">
+                    <span class="text-danger">
+                        <?php echo $errors['firstName']; ?>
+                    </span>
                 </div>
                 <!--lastName text box-->
                 <div class="form-group col-md-6">
                     <label for="lastName" class="form-label">Last Name:</label>
                     <input type="text" class="form-control" name="lastName" id="lastName" value = "<?php echo htmlspecialchars($lastName); ?>">
+                    <span class="text-danger">
+                        <?php echo $errors['lastName']; ?>
+                    </span>
                 </div>
                 <!--username text box-->
                 <div class="form-group col-12">
                     <label for="username" class="form-label">Username:</label>
                     <input type="text" class="form-control" name="username" id="username" value = "<?php echo htmlspecialchars($username); ?>">
+                    <span class="text-danger">
+                        <?php echo $errors['username']; ?>
+                    </span>
                 </div>
                 <!-- password text box-->
                 <div class="form-group col-12">
                     <label for="password" class="form-label">Password:</label>
                     <input type="password" class="form-control" name="password" id="password">
+                    <span class="text-danger">
+                        <?php echo $errors['password']; ?>
+                    </span>
                 </div>
                 <!--confirm password text box-->
                 <div class="form-group col-12">
                     <label for="confirm" class="form-label">Confirm Password:</label>
                     <input type="password" class="form-control" name="confirm" id="confirm">
+                    <span class="text-danger">
+                        <?php echo $errors['confirm']; ?>
+                    </span>
+                    <span class="text-danger">
+                        <?php echo $errors['empty']; ?>
+                    </span>
                 </div>
                 <!--The Register button-->
                 <button class="btn btn-primary" type="submit" name="submit">Register</button>
-
             </form>
-        
         </div>
-    
     </div>
-
-</body>
 
 <?php require_once "include/footer.php"; ?>
