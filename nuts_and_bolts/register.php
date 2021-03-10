@@ -91,7 +91,12 @@
 
                 $sql = "INSERT INTO employees(first_name, last_name, username, password) VALUES('$firstName', '$lastName', '$username', '$hash')";
 
-                mysqli_query($conn, $sql);
+                if(mysqli_query($conn, $sql))
+                {
+                    header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
+                    mysqli_close($conn);
+                    exit;
+                }
             }
         }
     }
@@ -101,25 +106,25 @@
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class = "container">
-                <a class="navbar-brand" href="index.php">Nuts and Bolts</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div class="navbar-nav">
-                        <a class="nav-link active" aria-current="page" href="index.php">Home</a>
-                        <a class="nav-link" href="products.php">Products</a>
-                        <a class="nav-link" href="add.php">Add Products</a>
-                        <a class="nav-link" href="update.php">Update Products</a>
-                        <a class="nav-link" href="faq.php">FAQ</a>
-                        <a class="nav-link" href="contact.php">Contact Us</a>
-                        <a class="nav-link" href="register.php">Register Employee</a>
-                    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class = "container">
+            <a class="navbar-brand" href="index.php">Nuts and Bolts</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="index.php">Home</a>
+                    <a class="nav-link" href="products.php">Products</a>
+                    <a class="nav-link" href="add.php">Add Products</a>
+                    <a class="nav-link" href="update.php">Update Products</a>
+                    <a class="nav-link" href="faq.php">FAQ</a>
+                    <a class="nav-link" href="contact.php">Contact Us</a>
+                    <a class="nav-link active" aria-current="page" href="register.php">Register Employee</a>
                 </div>
             </div>
-        </nav>
+        </div>
+    </nav>
 
     <?php if(array_filter($errors)): ?>
         <?php foreach ($errors as $error): ?>
@@ -134,37 +139,32 @@
         <h1>Register Employee</h1>
         
         <div class="container bg-light text-dark">
-            <form >
+            <form class="row g-3" action="register.php" method="POST">
                 <!--firstName text box-->
-                <div class="form-group col-6">
-                    <label for="firstName" class="form-label">First name:</label>
-                    <input type="text" class="form-control" name="firstName" id="firstName">
+                <div class="form-group col-md-6">
+                    <label for="firstName" class="form-label">First Name:</label>
+                    <input type="text" class="form-control" name="firstName" id="firstName" value = "<?php echo htmlspecialchars($firstName); ?>">
                 </div>
-                <br>
-                 <!--lastName text box-->
-                 <div class="form-group col-6">
-                    <label for="lastName" class="form-label">Last name:</label>
-                    <input type="text" class="form-control" name="lastName" id="lastName">
+                <!--lastName text box-->
+                <div class="form-group col-md-6">
+                    <label for="lastName" class="form-label">Last Name:</label>
+                    <input type="text" class="form-control" name="lastName" id="lastName" value = "<?php echo htmlspecialchars($lastName); ?>">
                 </div>
-                <br>
                 <!--username text box-->
-                <div class="form-group col-6">
+                <div class="form-group col-12">
                     <label for="username" class="form-label">Username:</label>
-                    <input type="text" class="form-control" name="username" id="username">
+                    <input type="text" class="form-control" name="username" id="username" value = "<?php echo htmlspecialchars($username); ?>">
                 </div>
-                <br>
                 <!-- password text box-->
-                <div class="form-group col-6">
+                <div class="form-group col-12">
                     <label for="password" class="form-label">Password:</label>
                     <input type="password" class="form-control" name="password" id="password">
                 </div>
-                <br>
                 <!--confirm password text box-->
-                <div class="form-group col-6">
+                <div class="form-group col-12">
                     <label for="confirm" class="form-label">Confirm Password:</label>
                     <input type="password" class="form-control" name="confirm" id="confirm">
                 </div>
-                <br>
                 <!--The Register button-->
                 <button class="btn btn-primary" type="submit" name="submit">Register</button>
 

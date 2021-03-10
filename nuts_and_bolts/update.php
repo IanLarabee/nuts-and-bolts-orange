@@ -154,7 +154,7 @@
         </nav>
         
         <div class="container">
-            <h1 id="testh1">Update Products</h1>
+            <h1>Update Products</h1>
             <div class="container bg-light text-dark">
                 <form class="row g-3" action="update.php" method="POST">
                    
