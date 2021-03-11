@@ -6,10 +6,10 @@
 	<body>
 
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-			<div class = "container">
+			<div class="container">
 				<a class="navbar-brand" href="index.php">Nuts and Bolts</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
+					<span class="navbar-toggler-icon"></span>
 				</button>
 				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
 					<div class="navbar-nav">
@@ -19,7 +19,11 @@
 						<a class="nav-link" href="update.php">Update Products</a>
 						<a class="nav-link active" aria-current="page" href="faq.php">FAQ</a>
 						<a class="nav-link" href="contact.php">Contact Us</a>
-						<a class="nav-link" href="register.php">Register Employee</a>
+					</div>
+					<div class="navbar-nav ms-auto flex-nowrap">
+						<a class="nav-link" href="register.php">Register</a>
+						<span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+						<a class="nav-link" href="#">Login</a>
 					</div>
 				</div>
 			</div>
@@ -38,5 +42,6 @@
 			<p>Founded in 1976, Nuts and Bolts was a product of hard work paying off during hard times. Nuts and Bolts merely started as a dream until store founder and former veteran James Augustus Deathblade was able to make it a reality. 
 			In his mid-thirties working as a bartender and fixing his friends' motorcycles at the local VA by day, Deathblade loved working with his hands but ends weren't meeting; he needed a change. 
 			Over the course of five long years, James pooled together what he could and was finally able to launch Nuts and Bolts and hasn't looked back since. Nuts and Bolts keeps prices low so that everyone has a chance to get their job done!</p>
+		</div>
 	
 <?php require_once "include/footer.php"; ?>
