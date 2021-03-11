@@ -6,10 +6,10 @@
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class = "container">
+            <div class="container">
                 <a class="navbar-brand" href="index.php">Nuts and Bolts</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
@@ -20,6 +20,11 @@
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link active" aria-current="page" href="contact.php">Contact Us</a>
                         <a class="nav-link" href="register.php">Register Employee</a>
+                    </div>
+                    <div class="navbar-nav ms-auto flex-nowrap">
+                        <a class="nav-link" href="register.php">Register</a>
+                        <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+                        <a class="nav-link" href="#">Login</a>
                     </div>
                 </div>
             </div>

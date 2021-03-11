@@ -89,18 +89,20 @@
         }
 
         if(!array_filter($errors)) {
+            $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=? WHERE sku=?");
+            $stmt->bind_param("sssds", $name, $sku, $desc, $price, $sku);
+
             $name = mysqli_real_escape_string($conn, $_POST['name']);
             $sku = mysqli_real_escape_string($conn, $_POST['sku']);
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
 
-            $sql = "UPDATE inventory SET product_name='$name', sku='$sku', description='$desc', price='$price' WHERE sku='$sku'";
-
-            if(mysqli_query($conn, $sql)) {
+            if($stmt->execute()) {
                 $_SESSION['updateStatus'] = true;
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
-                mysqli_close($conn);
-                exit();
+                $stmt->close();
+                $conn->close();
+                exit;
             }
         } else {
             $_SESSION['updateStatus'] = false;
@@ -134,10 +136,10 @@
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class = "container">
+            <div class="container">
                 <a class="navbar-brand" href="index.php">Nuts and Bolts</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
@@ -149,21 +151,26 @@
                         <a class="nav-link" href="contact.php">Contact Us</a>
                         <a class="nav-link" href="register.php">Register Employee</a>
                     </div>
+                    <div class="navbar-nav ms-auto flex-nowrap">
+                        <a class="nav-link" href="register.php">Register</a>
+                        <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+                        <a class="nav-link" href="#">Login</a>
+                    </div>
                 </div>
             </div>
         </nav>
         
         <div class="container">
-            <h1 id="testh1">Update Products</h1>
+            <h1>Update Products</h1>
             <div class="container bg-light text-dark">
                 <form class="row g-3" action="update.php" method="POST">
                    
                     <div class="form-group col-12">
                         <label for="productName" class="form-label">Product Name:</label>
                         <input type ="text" class="form-control" id="productName" name ="name" value="<?php echo htmlspecialchars($name); ?>">
-                        <p class="text-danger">
+                        <span class="text-danger">
                             <?php echo $errors['name']; ?>
-                        </p>
+                        </span>
                     </div>
                     
                     <div class="form-group <?php if(mysqli_num_rows($result) == 0 && !isset($_POST['update'])) { echo "col-12";} else { echo "col-md-6";}?>">
@@ -172,9 +179,9 @@
                             <span class="input-group-text">#</span>
                             <input type ="text" class="form-control" id="productSKU" name ="sku" value="<?php echo htmlspecialchars($sku); ?>">
                         </div>
-                        <p class="text-danger">
+                        <span class="text-danger">
                             <?php echo $errors['sku']; ?>
-                        </p>
+                        </span>
                     </div>
 
                     <?php                
@@ -208,17 +215,17 @@
                                 <span class="input-group-text">$ </span>
                                 <input type="text" class="form-control" id="productPrice" name="price" value="<?php echo htmlspecialchars($price); ?>">
                             </div>
-                            <p class="text-danger">
+                            <span class="text-danger">
                                 <?php echo $errors['price']; ?>
-                            </p>
+                            </span>
                         </div>
                         
                         <div class="form-group col-12">
                             <label for="productDescription" class="form-label">Description:</label>
                             <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"><?php echo htmlspecialchars($desc); ?></textarea>
-                            <p class="text-danger">
+                            <span class="text-danger">
                                 <?php echo $errors['desc']; ?>
-                            </p>
+                            </span>
                         </div>
                         
                         <?php                
