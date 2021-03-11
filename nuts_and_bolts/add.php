@@ -94,6 +94,7 @@
                         <a class="nav-link" href="update.php">Update Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
+                        <a class="nav-link" href="register.php">Register Employee</a>
                     </div>
                     <div class="navbar-nav ms-auto flex-nowrap">
                         <a class="nav-link" href="register.php">Register</a>
