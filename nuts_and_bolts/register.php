@@ -93,6 +93,8 @@
 
                 if(mysqli_query($conn, $sql))
                 {
+                    $_SESSION['postStatus'] = true;
+                    $_SESSION['username'] = htmlspecialchars($username);
                     header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
                     mysqli_close($conn);
                     exit;
@@ -182,6 +184,26 @@
                 </div>
                 <!--The Register button-->
                 <button class="btn btn-primary" type="submit" name="submit">Register</button>
+                <!--Success/fail message-->
+                <?php                
+                        if(isset($_SESSION['postStatus']) && $_SESSION['postStatus']) {
+                    ?>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <?php echo $_SESSION['username']; ?> was added successfully registered!
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php
+                        } elseif(isset($_SESSION['postStatus']) && !$_SESSION['postStatus']) {
+                    ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <?php if($username =='') { echo 'This user';}else{ echo htmlspecialchars($username);} ?> could not be registered due to an error.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php
+                        }
+                        unset($_SESSION['postStatus']);
+                        unset($_SESSION['username']);
+                    ?>
             </form>
         </div>
     </div>
