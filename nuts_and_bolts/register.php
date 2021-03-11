@@ -92,6 +92,8 @@
 
                 if($stmt->execute())
                 {
+                    $_SESSION['postStatus'] = true;
+                    $_SESSION['username'] = htmlspecialchars($username);
                     header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
                     $stmt->close();
                     $conn->close();
@@ -187,7 +189,7 @@
                         if(isset($_SESSION['postStatus']) && $_SESSION['postStatus']) {
                     ?>
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <?php echo $_SESSION['username']; ?> was added successfully registered!
+                            <?php echo $_SESSION['username']; ?> was successfully registered!
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <?php
