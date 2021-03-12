@@ -44,7 +44,7 @@
             if(count($rows) == 1) {
                 $name = $rows[0]['product_name'];
                 $sku = $rows[0]['sku'];
-                $selectSKU = $rows[0]['sku'];
+                $_SESSION['sku'] = $rows[0]['sku'];
                 $desc = $rows[0]['description'];
                 $price = $rows[0]['price'];
             }
@@ -94,13 +94,11 @@
             $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=? WHERE sku=?");
             $stmt->bind_param("sssds", $name, $sku, $desc, $price, $selectSKU);
 
-            if(isset($_SESSION['sku'])) {
-                $selectSKU = $_SESSION['sku'];
-            }
             $name = mysqli_real_escape_string($conn, $_POST['name']);
             $sku = mysqli_real_escape_string($conn, $_POST['sku']);
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
+            $selectSKU = $_SESSION['sku'];
 
             $name = stripslashes($name);
             $sku = stripslashes($sku);
