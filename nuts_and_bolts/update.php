@@ -24,6 +24,7 @@
     
 
     if(isset($_POST['select'])) {
+        $_SESSION['sku'] = $_POST['select'];
         echo json_encode(mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM inventory WHERE sku='".$_POST['select']."'")));
         exit();
     }
@@ -43,6 +44,7 @@
             if(count($rows) == 1) {
                 $name = $rows[0]['product_name'];
                 $sku = $rows[0]['sku'];
+                $selectSKU = $rows[0]['sku'];
                 $desc = $rows[0]['description'];
                 $price = $rows[0]['price'];
             }
@@ -90,19 +92,28 @@
 
         if(!array_filter($errors)) {
             $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=? WHERE sku=?");
-            $stmt->bind_param("sssds", $name, $sku, $desc, $price, $sku);
+            $stmt->bind_param("sssds", $name, $sku, $desc, $price, $selectSKU);
 
+            if(isset($_SESSION['sku'])) {
+                $selectSKU = $_SESSION['sku'];
+            }
             $name = mysqli_real_escape_string($conn, $_POST['name']);
             $sku = mysqli_real_escape_string($conn, $_POST['sku']);
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
 
+            $name = stripslashes($name);
+            $sku = stripslashes($sku);
+            $desc = stripslashes($desc);
+            $price = stripslashes($price);
+
             if($stmt->execute()) {
                 $_SESSION['updateStatus'] = true;
+                unset($_SESSION['sku']);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
                 $stmt->close();
                 $conn->close();
-                exit;
+                exit();
             }
         } else {
             $_SESSION['updateStatus'] = false;
