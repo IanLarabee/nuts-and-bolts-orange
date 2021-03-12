@@ -24,7 +24,7 @@
                     <div class="navbar-nav ms-auto flex-nowrap">
                         <a class="nav-link" href="register.php">Register</a>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
-                        <a class="nav-link" href="#">Login</a>
+                        <a class="nav-link" href="login.php">Login</a>
                     </div>
                 </div>
             </div>
