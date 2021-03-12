@@ -60,6 +60,11 @@
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
 
+            $name = stripslashes($name);
+            $sku = stripslashes($sku);
+            $desc = stripslashes($desc);
+            $price = stripslashes($price);
+
             if($stmt->execute()) {
                 $_SESSION['postStatus'] = true;
                 $_SESSION['name'] = htmlspecialchars($name);

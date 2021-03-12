@@ -231,29 +231,27 @@
                             if(count($rows) > 1 && !isset($_POST['update'])) {
                         ?>
                             <h5>Mutiple entries exist (Please select one):</h5>
-                            
-                            <table id="inventory">
-                            <tr>
-                            <th>Product Name</th>
-                            <th>SKU</th>
-                            <th>Description</th>
-                            <th>Price</th>
-                            </tr>
-
                             <?php 
+                            echo '<div class = "row row-cols-1 row-cols-md-4 g-3">';
                             for($item = 0; $item < count($rows); $item++) {
-                                echo "<tr>";
-                                echo "<td>" . $rows[$item]['product_name'] . "</td>";
-                                echo "<td>" . $rows[$item]['sku'] . "</td>";
-                                echo "<td>" . $rows[$item]['description'] . "</td>";
-                                echo "<td>$" . $rows[$item]['price'] . "</td>";
-                                echo "<td><button class='btn btn-primary select' type='button' value='".$rows[$item]['sku']."'>Select</button></td>";
-                                echo "</tr>";
-                            }
-                                echo "</table>";
-                            ?>
-                        <?php
-                            }
+                                echo '<div class = "col">
+                                    <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">' . $rows[$item]['product_name'] . '</h5>
+                                                <p class="card-text"><small class = "text-muted">SKU: ' . $rows[$item]['sku'] . '</small></p>
+                                            </div>
+                                            <ul class="h-100 list-group list-group-flush">
+                                                <li class="list-group-item">' . $rows[$item]['description'] . '</li>
+                                            </ul>
+                                            <div class="card-body">
+                                                <p class="card-text">$' . $rows[$item]['price'] . '</p>
+                                                <button class="btn btn-primary select" type="button" value="'.$rows[$item]['sku'].'">Select</button>
+                                            </div>
+                                        </div>
+                                    </div>';
+                                }
+                            echo "</div>";
+                        }
                         ?>
 
                         <button class="btn btn-primary" type="submit" name="update">Update</button>
