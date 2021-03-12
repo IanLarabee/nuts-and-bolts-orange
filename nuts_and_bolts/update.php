@@ -239,7 +239,7 @@
                         <?php                
                             if(count($rows) > 1 && !isset($_POST['update'])) {
                         ?>
-                            <h5>Mutiple entries exist (Please select one):</h5>
+                            <h5>Multiple entries exist (Please select one):</h5>
                             <?php 
                             echo '<div class = "row row-cols-1 row-cols-md-4 g-3">';
                             for($item = 0; $item < count($rows); $item++) {

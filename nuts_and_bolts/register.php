@@ -95,6 +95,7 @@
                     $_SESSION['postStatus'] = true;
                     $_SESSION['username'] = htmlspecialchars($username);
                     header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
+                    header("Location: login.php");
                     $stmt->close();
                     $conn->close();
                     exit;
