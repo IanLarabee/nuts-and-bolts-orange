@@ -126,9 +126,13 @@
                     <a class="nav-link" href="contact.php">Contact Us</a>
                 </div>
                 <div class="navbar-nav ms-auto flex-nowrap">
-                    <a class="nav-link active" aria-current="page" href="register.php">Register</a>
+                <?php if($userLoggedIn || $employeeLoggedIn): ?>
+                    <a class="nav-link" href="logout.php">Logout</a>
+                <?php else : ?>
+                    <a class="nav-link" href="register.php">Register</a>
                     <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                     <a class="nav-link" href="login.php">Login</a>
+                <?php endif; ?>
                 </div>
             </div>
         </div>

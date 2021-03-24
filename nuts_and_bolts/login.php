@@ -66,6 +66,8 @@
                                     $_SESSION['userId'] = $id;
                                     $_SESSION['username'] = $username;
                                     mysqli_query($conn,"delete from loginlogs where IpAddress='$ip_address'");
+                                    $stmt->close();
+                                    $conn->close();
                                     header("Location: index.php");
                                 }
                                 else
@@ -107,6 +109,8 @@
                                             $_SESSION['userId'] = $id;
                                             $_SESSION['username'] = $username;
                                             mysqli_query($conn,"delete from loginlogs where IpAddress='$ip_address'");
+                                            $stmt->close();
+                                            $conn->close();
                                             header("Location: index.php");
                                         }
                                         else

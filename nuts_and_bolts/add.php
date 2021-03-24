@@ -102,9 +102,13 @@
                         <a class="nav-link" href="register.php">Register Employee</a>
                     </div>
                     <div class="navbar-nav ms-auto flex-nowrap">
+                    <?php if($userLoggedIn || $employeeLoggedIn): ?>
+                        <a class="nav-link" href="logout.php">Logout</a>
+                    <?php else : ?>
                         <a class="nav-link" href="register.php">Register</a>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="login.php">Login</a>
+                    <?php endif; ?>
                     </div>
                 </div>
             </div>
