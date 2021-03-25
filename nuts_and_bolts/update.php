@@ -1,4 +1,15 @@
 <?php
+    session_start();
+
+    if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
+        $userLoggedIn = $_SESSION['isUser'];
+        $employeeLoggedIn = $_SESSION['isEmployee'];
+    } else {
+        $userLoggedIn = false;
+        $employeeLoggedIn = false;
+    }
+?>
+<?php
     require_once "config/connect.php";
 
     session_start();

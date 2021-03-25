@@ -1,3 +1,14 @@
+<?php
+    session_start();
+
+    if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
+        $userLoggedIn = $_SESSION['isUser'];
+        $employeeLoggedIn = $_SESSION['isEmployee'];
+    } else {
+        $userLoggedIn = false;
+        $employeeLoggedIn = false;
+    }
+?>
 <?php require_once "include/header.php"; ?>
 
         <title>Contact Us | Nuts and Bolts</title>
@@ -15,11 +26,13 @@
                     <div class="navbar-nav">
                         <a class="nav-link" href="index.php">Home</a>
                         <a class="nav-link" href="products.php">Products</a>
-                        <a class="nav-link" href="add.php">Add Products</a>
-                        <a class="nav-link" href="update.php">Update Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link active" aria-current="page" href="contact.php">Contact Us</a>
+                    <?php if($employeeLoggedIn): ?>
+                        <a class="nav-link" href="add.php">Add Products</a>
+                        <a class="nav-link" href="update.php">Update Products</a>
                         <a class="nav-link" href="register.php">Register Employee</a>
+                    <?php endif; ?> 
                     </div>
                     <div class="navbar-nav ms-auto flex-nowrap">
                     <?php if($userLoggedIn || $employeeLoggedIn): ?>
