@@ -1,7 +1,16 @@
 <?php
-    require_once "config/connect.php";
-
     session_start();
+
+    if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
+        $userLoggedIn = $_SESSION['isUser'];
+        $employeeLoggedIn = $_SESSION['isEmployee'];
+    } else {
+        $userLoggedIn = false;
+        $employeeLoggedIn = false;
+    }
+?>
+<?php
+    require_once "config/connect.php";
 
     $name = '';
     $sku = '';
@@ -10,6 +19,21 @@
     $success = '';
 
     $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'');
+
+    if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
+        ;
+    } else {
+        $_SESSION['loginmessage'] = True;
+        header("location: login.php");
+    }
+
+    if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
+        $userLoggedIn = $_SESSION['isUser'];
+        $employeeLoggedIn = $_SESSION['isEmployee'];
+    } else {
+        $userLoggedIn = false;
+        $employeeLoggedIn = false;
+    }
 
     if(isset($_POST['submit'])) {
         if(empty($_POST['name'])) {
@@ -101,9 +125,19 @@
                         <a class="nav-link" href="contact.php">Contact Us</a>
                     </div>
                     <div class="navbar-nav ms-auto flex-nowrap">
+                    <?php if($userLoggedIn): ?>
+                        <?php echo '<p class="nav-link">'. $_SESSION['username'] . '</p>' ?>
+                        <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+                        <a class="nav-link" href="logout.php">Logout</a>
+                    <?php elseif($employeeLoggedIn): ?>
+                        <?php echo '<p class="nav-link">'. $_SESSION['firstname'] . '</p>' ?>
+                        <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+                        <a class="nav-link" href="logout.php">Logout</a>
+                    <?php else: ?>
                         <a class="nav-link" href="register.php">Register</a>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="login.php">Login</a>
+                    <?php endif; ?>
                     </div>
                 </div>
             </div>
