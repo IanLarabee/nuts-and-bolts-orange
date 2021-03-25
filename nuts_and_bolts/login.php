@@ -16,7 +16,8 @@
     $errors = [];
 
     $_SESSION['userId'] = ""; 
-    $_SESSION['username'] = ""; 
+    $_SESSION['username'] = "";
+    $_SESSION['firstname'] = "";
     $_SESSION['isUser'] = false;
     $_SESSION['isEmployee'] = false;
 
@@ -55,7 +56,7 @@
                 {
                     //$hash = password_hash($password, PASSWORD_BCRYPT);
 
-                    $stmt = $conn->prepare("SELECT id, username, password FROM employees WHERE username=?");
+                    $stmt = $conn->prepare("SELECT id, first_name, username, password FROM employees WHERE username=?");
                     $stmt->bind_param("s", $username);
 
                     if($stmt->execute())
@@ -64,7 +65,7 @@
 
                         if ($stmt->num_rows == 1)
                         {
-                            $stmt->bind_result($id, $username, $hash);
+                            $stmt->bind_result($id, $firstName, $username, $hash);
 
                             if($stmt->fetch())
                             {
@@ -74,6 +75,7 @@
 
                                     $_SESSION['isEmployee'] = true;
                                     $_SESSION['userId'] = $id;
+                                    $_SESSION['firstname'] = $firstName;
                                     $_SESSION['username'] = $username;
                                     mysqli_query($conn,"delete from loginlogs where IpAddress='$ip_address'");
                                     $stmt->close();

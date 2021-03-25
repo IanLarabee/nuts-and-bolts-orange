@@ -35,11 +35,15 @@
                     <?php endif; ?> 
 					</div>
 					<div class="navbar-nav ms-auto flex-nowrap">
-					<?php if($userLoggedIn || $employeeLoggedIn): ?>
-						<?php echo '<p class="nav-link">'. $_SESSION['username'] . '</p>' ?>
+					<?php if($userLoggedIn): ?>
+                        <?php echo '<p class="nav-link">'. $_SESSION['username'] . '</p>' ?>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
-                    <?php else : ?>
+                    <?php elseif($employeeLoggedIn): ?>
+                        <?php echo '<p class="nav-link">'. $_SESSION['firstname'] . '</p>' ?>
+                        <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+                        <a class="nav-link" href="logout.php">Logout</a>
+                    <?php else: ?>
                         <a class="nav-link" href="register.php">Register</a>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="login.php">Login</a>
