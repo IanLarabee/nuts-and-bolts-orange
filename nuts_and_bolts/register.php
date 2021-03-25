@@ -14,6 +14,12 @@
     require_once "config/connect.php";
 
 
+    $userGroup = "users";
+
+    if($_SESSION(isEmployee)) {
+        $userGroup = "employees";
+    }
+
     $firstName = "";
     $lastName = "";
     $username = "";
@@ -49,7 +55,7 @@
         $specialChars = preg_match('@[^\w]@', $password);
 
         //If any fields are empty, give error
-        if(empty($firstName) || empty($lastName) || empty($username) || empty($password) || empty($confirm))
+        if(((empty($firstName) || empty($lastName)) && $_SESSION(isEmployee)) || empty($username) || empty($password) || empty($confirm))
         {
             $errors['empty'] = "All fields are required";
         }
@@ -61,7 +67,7 @@
         //Check last name requirements
         else if(!$lCharNum)
         {
-            $errors['lastName'] = "last name is too long";
+            $errors['lastName'] = "Last name is too long";
         }
         //Check username requirements
         else if ($uUpperCase || $uSpaces || !$uCharNum)
@@ -75,7 +81,7 @@
         }
         else
         {
-            $u_sql = "SELECT * FROM employees WHERE username='$username'";
+            $u_sql = "SELECT * FROM $userGroup WHERE username='$username'";
             $result = mysqli_query($conn, $u_sql);
 
             //If username already exists, give error
@@ -91,7 +97,7 @@
             //Enter user in DB
             else
             {   
-                $stmt = $conn->prepare("INSERT INTO employees(first_name, last_name, username, password) VALUES(?, ?, ?, ?)");
+                $stmt = $conn->prepare("INSERT INTO $userGroup(first_name, last_name, username, password) VALUES(?, ?, ?, ?)");
                 $stmt->bind_param("ssss", $firstName, $lastName, $username, $hash);
 
                 $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
@@ -115,7 +121,7 @@
     }
 ?>
 
-<title>Register Employee | Nuts and Bolts</title>
+<title>Registration | Nuts and Bolts</title>
 </head>
 
 <body>
@@ -154,28 +160,30 @@
         </div>
     </nav>
 
-    <!-- This is the Register Employee form-->
+    <!-- This is the Registration form-->
     <div class="container">
-        <h1>Register Employee</h1>
+        <h1>Register<?php if($_SESSION['isEmployee']) { echo "Employees"; }?></h1>
         
         <div class="container bg-light text-dark">
             <form class="row g-3" action="register.php" method="POST">
-                <!--firstName text box-->
-                <div class="form-group col-md-6">
-                    <label for="firstName" class="form-label">First Name:</label>
-                    <input type="text" class="form-control" name="firstName" id="firstName" value = "<?php echo htmlspecialchars($firstName); ?>">
-                    <span class="text-danger">
-                        <?php echo $errors['firstName']; ?>
-                    </span>
-                </div>
-                <!--lastName text box-->
-                <div class="form-group col-md-6">
-                    <label for="lastName" class="form-label">Last Name:</label>
-                    <input type="text" class="form-control" name="lastName" id="lastName" value = "<?php echo htmlspecialchars($lastName); ?>">
-                    <span class="text-danger">
-                        <?php echo $errors['lastName']; ?>
-                    </span>
-                </div>
+                <?php if($_SESSION['isEmployee']) { ?>
+                    <!--firstName text box-->
+                    <div class="form-group col-md-6">
+                        <label for="firstName" class="form-label">First Name:</label>
+                        <input type="text" class="form-control" name="firstName" id="firstName" value = "<?php echo htmlspecialchars($firstName); ?>">
+                        <span class="text-danger">
+                            <?php echo $errors['firstName']; ?>
+                        </span>
+                    </div>
+                    <!--lastName text box-->
+                    <div class="form-group col-md-6">
+                        <label for="lastName" class="form-label">Last Name:</label>
+                        <input type="text" class="form-control" name="lastName" id="lastName" value = "<?php echo htmlspecialchars($lastName); ?>">
+                        <span class="text-danger">
+                            <?php echo $errors['lastName']; ?>
+                        </span>
+                    </div>
+                <?php } ?>
                 <!--username text box-->
                 <div class="form-group col-12">
                     <label for="username" class="form-label">Username:</label>
