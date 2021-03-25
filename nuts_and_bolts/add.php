@@ -11,6 +11,21 @@
 
     $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'');
 
+    if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
+        ;
+    } else {
+        $_SESSION['loginmessage'] = True;
+        header("location: login.php");
+    }
+
+    if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
+        $userLoggedIn = $_SESSION['isUser'];
+        $employeeLoggedIn = $_SESSION['isEmployee'];
+    } else {
+        $userLoggedIn = false;
+        $employeeLoggedIn = false;
+    }
+
     if(isset($_POST['submit'])) {
         if(empty($_POST['name'])) {
             $errors['name'] = 'A product name is required';

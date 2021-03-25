@@ -22,6 +22,20 @@
 
     $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'');
     
+    if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
+        ;
+    } else {
+        $_SESSION['loginmessage'] = True;
+        header("location: login.php");
+    }
+
+    if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
+        $userLoggedIn = $_SESSION['isUser'];
+        $employeeLoggedIn = $_SESSION['isEmployee'];
+    } else {
+        $userLoggedIn = false;
+        $employeeLoggedIn = false;
+    }
 
     if(isset($_POST['select'])) {
         echo json_encode(mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM inventory WHERE sku='".$_POST['select']."'")));
