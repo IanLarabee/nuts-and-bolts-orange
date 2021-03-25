@@ -28,14 +28,14 @@
 						<a class="nav-link" href="products.php">Products</a>
 						<a class="nav-link active" aria-current="page" href="faq.php">FAQ</a>
 						<a class="nav-link" href="contact.php">Contact Us</a>
-					<?php if($employeeLoggedIn): ?>
+					  <?php if($employeeLoggedIn): ?>
                         <a class="nav-link" href="add.php">Add Products</a>
                         <a class="nav-link" href="update.php">Update Products</a>
                         <a class="nav-link" href="register.php">Register Employee</a>
-                    <?php endif; ?> 
+            <?php endif; ?> 
 					</div>
 					<div class="navbar-nav ms-auto flex-nowrap">
-					<?php if($userLoggedIn): ?>
+					          <?php if($userLoggedIn): ?>
                         <?php echo '<p class="nav-link">'. $_SESSION['username'] . '</p>' ?>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
