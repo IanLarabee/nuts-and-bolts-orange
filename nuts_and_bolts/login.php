@@ -34,7 +34,7 @@
 
             if($total_count==3)
             {
-                array_push($errors, "To many failed login attempts. Please try again after 15 minutes.");
+                array_push($errors, "Too many failed login attempts. Please try again after 15 minutes.");
             }
             else
             {
@@ -212,32 +212,27 @@
 
     <div class="container">
         <h1>Login</h1>
-
-        <?php if (count($errors) > 0): ?>
-		    <ul class="errors">
-			    <?php foreach ($errors as $error): ?>
-				    <li><?=$error?></li>
-			    <?php endforeach; ?>
-		    </ul>
-        <?php endif; ?>
         
-        <form action="login.php" method="post">
-            <div class="container bg-light text-dark">
-                <div class="form-group col-md-6">
+        <div class="container bg-light text-dark">
+            <form class="row g-3" action="login.php" method="post">
+                <div class="form-group col-md-12">
                     <label for="username" class="form-label">Username:</label>
                     <input type="text" class="form-control" name="username" id="username">
                 </div>
-            <!--password text box-->
-            <div class="form-group col-md-6">
-                <label for="password" class="form-label">Password:</label>
-                <input type="password" class="form-control" name="password" id="password">
+                <!--password text box-->
+                <div class="form-group col-md-12">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" class="form-control" name="password" id="password">
+                    <?php if (count($errors) > 0): ?>
+                        <?php foreach ($errors as $error): ?>
+                            <span class="text-danger"><?=$error?></span><br>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-            </div>
-            <!--login button -->
-            <br>
-            <button class="btn btn-primary" type="submit" name="submit">Login</button>
-        </form>
-            
+                <!--login button -->
+                <button class="btn btn-primary" type="submit" name="submit">Login</button>
+            </form>
+        </div>
     </div>
 
 <?php require_once "include/footer.php"; ?>

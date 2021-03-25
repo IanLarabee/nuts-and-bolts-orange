@@ -126,11 +126,11 @@
                     </div>
                     <div class="navbar-nav ms-auto flex-nowrap">
                     <?php if($userLoggedIn): ?>
-                        <?php echo '<p class="nav-link">'. $_SESSION['username'] . '</p>' ?>
+                        <?php echo '<span class="nav-link">'. $_SESSION['username'] . '</span>' ?>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php elseif($employeeLoggedIn): ?>
-                        <?php echo '<p class="nav-link">'. $_SESSION['firstname'] . '</p>' ?>
+                        <?php echo '<span class="nav-link">'. $_SESSION['firstname'] . '</span>' ?>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php else: ?>

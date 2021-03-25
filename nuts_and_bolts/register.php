@@ -16,7 +16,7 @@
 
     $userGroup = "users";
 
-    if($_SESSION(isEmployee)) {
+    if(isset($_SESSION['isEmployee']) && $_SESSION['isEmployee']) {
         $userGroup = "employees";
     }
 
@@ -31,8 +31,10 @@
     if(isset($_POST['submit'])) {
 
         //Store their responses 
-        $firstName = $_POST['firstName'];
-        $lastName = $_POST['lastName'];
+        if(isset($_SESSION['isEmployee']) && $_SESSION['isEmployee']) {
+            $firstName = $_POST['firstName'];
+            $lastName = $_POST['lastName'];
+        }
         $username = $_POST['username'];
         $password = $_POST['password'];
         $confirm = $_POST['confirm'];
@@ -55,19 +57,25 @@
         $specialChars = preg_match('@[^\w]@', $password);
 
         //If any fields are empty, give error
-        if(((empty($firstName) || empty($lastName)) && $_SESSION(isEmployee)) || empty($username) || empty($password) || empty($confirm))
+        if(isset($_SESSION['isEmployee']) && $_SESSION['isEmployee']) {
+            if(empty($firstName) || empty($lastName)) {
+                $errors['empty'] = "All fields are required";
+            }
+            //Check first name requirements
+            else if(!$fCharNum)
+            {
+                $errors['firstName'] = "First name is too long";
+            }
+            //Check last name requirements
+            else if(!$lCharNum)
+            {
+                $errors['lastName'] = "Last name is too long";
+            }
+        }
+        
+        if(empty($username) || empty($password) || empty($confirm))
         {
             $errors['empty'] = "All fields are required";
-        }
-        //Check first name requirements
-        else if(!$fCharNum)
-        {
-            $errors['firstName'] = "First name is too long";
-        }
-        //Check last name requirements
-        else if(!$lCharNum)
-        {
-            $errors['lastName'] = "Last name is too long";
         }
         //Check username requirements
         else if ($uUpperCase || $uSpaces || !$uCharNum)
@@ -99,9 +107,11 @@
             {   
                 $stmt = $conn->prepare("INSERT INTO $userGroup(first_name, last_name, username, password) VALUES(?, ?, ?, ?)");
                 $stmt->bind_param("ssss", $firstName, $lastName, $username, $hash);
-
-                $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
-                $lastName = mysqli_real_escape_string($conn, $_POST['lastName']);
+                
+                if(isset($_SESSION['isEmployee']) && $_SESSION['isEmployee']) {
+                    $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
+                    $lastName = mysqli_real_escape_string($conn, $_POST['lastName']);
+                }
                 $username = mysqli_real_escape_string($conn, $_POST['username']);
                 $password = mysqli_real_escape_string($conn, $_POST['password']);
                 $hash = password_hash($password, PASSWORD_BCRYPT);
@@ -136,22 +146,25 @@
                 <div class="navbar-nav">
                     <a class="nav-link" href="index.php">Home</a>
                     <a class="nav-link" href="products.php">Products</a>
-                    <a class="nav-link" href="add.php">Add Products</a>
-                    <a class="nav-link" href="update.php">Update Products</a>
                     <a class="nav-link" href="faq.php">FAQ</a>
                     <a class="nav-link" href="contact.php">Contact Us</a>
+                    <?php if($employeeLoggedIn): ?>
+                        <a class="nav-link" href="add.php">Add Products</a>
+                        <a class="nav-link" href="update.php">Update Products</a>
+                        <a class="nav-link" href="register.php">Register Employee</a>
+                    <?php endif; ?> 
                 </div>
                 <div class="navbar-nav ms-auto flex-nowrap">
                 <?php if($userLoggedIn): ?>
-                    <?php echo '<p class="nav-link">'. $_SESSION['username'] . '</p>' ?>
+                    <?php echo '<span class="nav-link">'. $_SESSION['username'] . '</span>' ?>
                     <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                     <a class="nav-link" href="logout.php">Logout</a>
                 <?php elseif($employeeLoggedIn): ?>
-                    <?php echo '<p class="nav-link">'. $_SESSION['firstname'] . '</p>' ?>
+                    <?php echo '<span class="nav-link">'. $_SESSION['firstname'] . '</span>' ?>
                     <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                     <a class="nav-link" href="logout.php">Logout</a>
                 <?php else: ?>
-                    <a class="nav-link" href="register.php">Register</a>
+                    <a class="nav-link active" aria-current="page" href="register.php">Register</a>
                     <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                     <a class="nav-link" href="login.php">Login</a>
                 <?php endif; ?>
@@ -162,11 +175,11 @@
 
     <!-- This is the Registration form-->
     <div class="container">
-        <h1>Register<?php if($_SESSION['isEmployee']) { echo "Employees"; }?></h1>
+        <h1>Register<?php if(isset($_SESSION['isEmployee']) && $_SESSION['isEmployee']) { echo "Employees"; }?></h1>
         
         <div class="container bg-light text-dark">
             <form class="row g-3" action="register.php" method="POST">
-                <?php if($_SESSION['isEmployee']) { ?>
+                <?php if(isset($_SESSION['isEmployee']) && $_SESSION['isEmployee']) { ?>
                     <!--firstName text box-->
                     <div class="form-group col-md-6">
                         <label for="firstName" class="form-label">First Name:</label>
