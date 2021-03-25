@@ -12,8 +12,6 @@
 <?php
     require_once "config/connect.php";
 
-    session_start();
-
     $name = '';
     $sku = '';
     $desc = '';

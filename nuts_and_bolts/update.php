@@ -12,8 +12,6 @@
 <?php
     require_once "config/connect.php";
 
-    session_start();
-
     function searchForSKU($id, $array) {
         foreach ($array as $key => $val) {
             if ($val['sku'] === $id) {
