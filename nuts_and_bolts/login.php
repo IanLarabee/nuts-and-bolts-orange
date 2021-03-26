@@ -84,22 +84,14 @@
                                 }
                                 else
                                 {
-                                    array_push($errors, "Invalid username or password");
-                                    $total_count++;
-                                    $rem_attm=3-$total_count;
-
-                                    if($rem_attm==0)
-                                    {
-                                        array_push($errors, "Too many failed login attempts. Please login after 15 minutes");
-                                    }
-
-                                    $try_time=time();
-                                    mysqli_query($conn,"insert into loginlogs(IpAddress,TryTime) values('$ip_address','$try_time')");
+                                   goto usercheck;
                                 }
                             }
                         } 
                         else
                         {
+                            usercheck:
+                            
                             $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username=?");
                             $stmt->bind_param("s", $username);
 
