@@ -57,7 +57,7 @@
 			<h1>Frequently Asked Questions (FAQ)</h1>
 
 			<h2>What are Nuts and Bolts Hardware Store hours?</h2>
-			<p>Monday - Friday 7 AM - 10 PM; Saturday 8 AM - 8 PM; Sunday 10 AM - 5 PM</p>
+			<p>Monday - Friday 7 AM - 10 PM; Saturday 8 AM - 8 PM; Sunday 10 AM - 6 PM</p>
 
 			<h2>What is our return policy</h2>
 			<p>All returns accepted within 7 days of purchase with no questions asked.</p>
