@@ -57,15 +57,15 @@
 
                         if($stmt->fetch())
                         {
-                            //$query=mysqli_query($conn,"select count(*) as total_count from loginlogs where TryTime > $time and user_id='$id'");
-                            //$check_login_row=mysqli_fetch_assoc($query);
-                            //$total_count=$check_login_row['total_count'];
+                            $query=mysqli_query($conn,"select count(*) as total_count from loginlogs where TryTime > $time and user_id='$id'");
+                            $check_login_row=mysqli_fetch_assoc($query);
+                            $total_count=$check_login_row['total_count'];
                                     
-                            /*if($total_count==3)
+                            if($total_count==3)
                             {
                                 array_push($errors, "Too many failed login attempts. Please try again after 15 minutes.");
                             }
-                            else*/ if(password_verify($password, $hash))
+                            else if(password_verify($password, $hash))
                             {
                                 session_start();
 
@@ -80,13 +80,23 @@
                             }
                             else
                             {
-                                goto usercheck;
+                                array_push($errors, "Invalid username or password");
+                                $total_count++;
+                                $rem_attm=3-$total_count;
+
+                                if($rem_attm==0)
+                                {
+                                    array_push($errors, "Too many failed login attempts. Please login after 15 minutes");
+                                }
+
+                                $try_time=time();
+                                mysqli_query($conn,"insert into loginlogs(IpAddress,TryTime,user_id) values('$ip_address','$try_time','$id')");
                             }
                         }
                     } 
                     else
                     {
-                        usercheck:
+                        //usercheck:
 
                         $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username=?");
                         $stmt->bind_param("s", $username);
@@ -136,7 +146,7 @@
                                         mysqli_query($conn,"insert into loginlogs(IpAddress,TryTime,user_id) values('$ip_address','$try_time','$id')");
                                     }
                                 }
-                            } 
+                            }
                         }
                     }
                 }

@@ -89,11 +89,13 @@
         }
         else
         {
-            $u_sql = "SELECT * FROM $userGroup WHERE username='$username'";
-            $result = mysqli_query($conn, $u_sql);
+            $u_sql = "SELECT * FROM users WHERE username='$username'";
+            $e_sql = "SELECT * FROM employees WHERE username='$username'";
+            $uResult = mysqli_query($conn, $u_sql);
+            $eResult = mysqli_query($conn, $e_sql);
 
             //If username already exists, give error
-            if (mysqli_num_rows($result) > 0)
+            if (mysqli_num_rows($uResult) > 0 || mysqli_num_rows($eResult) > 0)
             {
                 $errors['username'] = "That username is taken";
             }
