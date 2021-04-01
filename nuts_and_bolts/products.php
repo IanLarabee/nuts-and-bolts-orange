@@ -8,10 +8,34 @@
         $userLoggedIn = false;
         $employeeLoggedIn = false;
     }
+
+    if(!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = array();
+    }
+
+    if(isset($_POST['add'])) {
+        $_SESSION['cart'][$_POST['add']] += 1;
+    }
 ?>
 <?php require_once "include/header.php"; ?>
 <?php require_once "config/connect.php" ?>
+    <script>
+        $(document).ready(function(){
+            $('.product-card').on('submit', function(){
+                $.ajax({
+                    type: 'post',
+                    context: this,
+                    data: {add: $(this).find("p[class='card-text product-sku']").text()},
+                    success: function(){
+                        $("div[class='alert alert-success alert-dismissible fade show']").show();
+                        $('#alert-message').text($(this).find('.card-title').text() + " as Added to Your Cart.");
 
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
     <title>Products | Nuts and Bolts</title>
     </head>
     <body>
@@ -33,6 +57,8 @@
                             <a class="nav-link" href="update.php">Update Products</a>
                             <a class="nav-link" href="register.php">Register Employee</a>
                         <?php endif; ?> 
+                        <a class="nav-link" href="Cart.php"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart4" viewBox="0 0 16 16">
+                        <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l.5 2H5V5H3.14zM6 5v2h2V5H6zm3 0v2h2V5H9zm3 0v2h1.36l.5-2H12zm1.11 3H12v2h.61l.5-2zM11 8H9v2h2V8zM8 8H6v2h2V8zM5 8H3.89l.5 2H5V8zm0 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg></a>
                     </div>
                     <div class="navbar-nav ms-auto flex-nowrap">
                     <?php if($userLoggedIn): ?>
@@ -55,7 +81,11 @@
 
         <div class = "container">
             <h1>Products</h1>
-
+            
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
+                <span id="alert-message"></span>
+            </div>
+            
             <div class = "row row-cols-1 row-cols-md-4 g-3">
 
             <?php $result = mysqli_query($conn, "SELECT * FROM inventory"); ?>
@@ -64,20 +94,25 @@
             while($row = mysqli_fetch_array($result))
             {
                 echo '<div class = "col">
-                    <div class="card h-100">
-                    
-                            <div class="card-body">
-                                <h5 class="card-title">' . $row['product_name'] . '</h5>
-                                <p class="card-text"><small class = "text-muted">SKU: ' . $row['sku'] . '</small></p>
-                            </div>
-                            <ul class="h-100 list-group list-group-flush">
-                                <li class="list-group-item">' . $row['description'] . '</li>
-                            </ul>
-                            <div class="card-body">
-                                <p class="card-text">$' . $row['price'] . '</p>
+                    <form class="product-card">
+                        <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">' . $row['product_name'] . '</h5>
+                                    <p class="card-text product-sku"><small class = "text-muted">SKU: ' . $row['sku'] . '</small></p>
+                                </div>
+                                <ul class="h-100 list-group list-group-flush">
+                                    <li class="list-group-item">' . $row['description'] . '</li>
+                                </ul>
+                                <div class="card-body">
+                                    <p class="card-text">$' . $row['price'] . '</p>
+                                </div>
+                                <div class="card-body row">
+                                    <button class="btn btn-primary select" type="submit">Add to Cart</button>
+                                </div>
                             </div>
                         </div>
-                    </div>';
+                    </form>'
+                ;
 
             }
 
