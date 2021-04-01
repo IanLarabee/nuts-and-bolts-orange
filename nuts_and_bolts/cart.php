@@ -13,7 +13,8 @@
 		$_SESSION['cart'] = array();
 	}
 ?>
-<?php require_once "include/header.php"; ?>
+<?php require_once "include/header.php" ?>
+<?php require_once "config/connect.php" ?>
 
 		<title>Your Cart</title>
 
@@ -62,6 +63,39 @@
 
 		<div class="container">
             <h1>Cart</h1>
+			<?php
+			if(isset($_SESSION['cart']) && count($_SESSION['cart']) != 0) {
+			  
+				foreach($_SESSION['cart'] as $sku => $qty) {
+			  
+				  $query  = "SELECT * FROM inventory WHERE sku='$sku'";
+				  $result = mysqli_query($conn, $query);
+			  
+				  if(mysqli_num_rows($result) == 1) {
+					$row = mysqli_fetch_array($result);
+			  
+					$id = $row['product_id'];
+					$name = $row['product_name'];
+					$price = $row['price'];
+			  
+					echo(
+					  "<div class='card' style='width: 75%'>
+						<div class='card-body'>
+						  $name<br>
+						  $$price 
+						  Quantity: $qty
+						</div>
+					  </div>");
+				  }
+				}
+			} else {
+				?>
+				<div class="alert alert-secondary" role="alert">
+				Your cart is currently empty!
+				</div>
+				<?php 
+			}
+				?>
 			<a href="cart.php?cmd=true">Remove All Products from Cart</a>
 		</div>
 		
