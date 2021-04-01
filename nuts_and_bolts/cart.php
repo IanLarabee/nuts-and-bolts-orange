@@ -65,29 +65,66 @@
             <h1>Cart</h1>
 			<?php
 			if(isset($_SESSION['cart']) && count($_SESSION['cart']) != 0) {
-			  
+				$total = 0;
+				echo(
+					"<div class='card-body'>
+					<div class='table-responsive'>
+					<table class='table table-bordered m-0'>
+						<thead>
+						<tr>
+							<th class='text-center py-3 px-4' style='min-width: 400px;'>Product</th>
+							<th class='text-right py-3 px-4' style='width: 100px;'>Price</th>
+							<th class='text-center py-3 px-4' style='width: 120px;'>Quantity</th>
+							<th class='text-right py-3 px-4' style='width: 100px;'>Subtotal</th>
+						</tr>
+						</thead>
+						<tbody>"
+					);
+		
 				foreach($_SESSION['cart'] as $sku => $qty) {
 			  
 				  $query  = "SELECT * FROM inventory WHERE sku='$sku'";
 				  $result = mysqli_query($conn, $query);
-			  
+
 				  if(mysqli_num_rows($result) == 1) {
 					$row = mysqli_fetch_array($result);
 			  
 					$id = $row['product_id'];
 					$name = $row['product_name'];
+					$description = $row['description'];
 					$price = $row['price'];
-			  
+					$subtotal = $price * $qty;
+					$total = $total + $subtotal;
+
 					echo(
-					  "<div class='card' style='width: 75%'>
-						<div class='card-body'>
-						  $name<br>
-						  $$price 
-						  Quantity: $qty
+						"<tr>
+						<td class='p-4'>
+						<div class='media align-items-center'>
+							<div class='media-body'>
+							<strong>$name</strong>
+							<br>
+							<small>
+							<span class='text-muted'>$description</span>
+							</small>
+							</div>
 						</div>
-					  </div>");
+						</td>
+						<td class='text-right font-weight-semibold align-middle p-4'>$$price</td>
+						<td class='align-middle p-4'>$qty</td>
+						<td class='text-right font-weight-semibold align-middle p-4'>$$subtotal</td>
+						</tr>"
+					);
 				  }
 				}
+				echo(
+					"</tbody>
+					</table>
+					</div>
+						<div class='text-right mt-4'>
+						<h4><strong>Total price:</strong> $$total</h4>
+						</div>
+					</div>"
+				);
 			} else {
 				?>
 				<div class="alert alert-secondary" role="alert">
