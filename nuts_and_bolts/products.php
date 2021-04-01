@@ -25,11 +25,10 @@
                 $.ajax({
                     type: 'post',
                     context: this,
-                    data: {add: $(this).find("p[class='card-text product-sku']").text()},
+                    data: {add: $(this).find("p[class='card-text product-sku']").text().slice(5)},
                     success: function(){
                         $("div[class='alert alert-success alert-dismissible fade show']").show();
                         $('#alert-message').text($(this).find('.card-title').text() + " was Added to Your Cart.");
-
                     }
                 });
                 return false;
@@ -98,7 +97,7 @@
                         <div class="card h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">' . $row['product_name'] . '</h5>
-                                    <p class="card-text product-sku"><small class = "text-muted">' . $row['sku'] . '</small></p>
+                                    <p class="card-text product-sku"><small class = "text-muted">SKU: ' . $row['sku'] . '</small></p>
                                 </div>
                                 <ul class="h-100 list-group list-group-flush">
                                     <li class="list-group-item">' . $row['description'] . '</li>
