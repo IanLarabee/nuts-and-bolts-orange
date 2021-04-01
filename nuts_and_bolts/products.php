@@ -28,7 +28,7 @@
                     data: {add: $(this).find("p[class='card-text product-sku']").text().slice(5)},
                     success: function(){
                         $("div[class='alert alert-success alert-dismissible fade show']").show();
-                        $('#alert-message').text($(this).find('.card-title').text() + " was Added to Your Cart.");
+                        $('#alert-message').text($(this).find('.card-title').text() + " was added to your cart.");
                     }
                 });
                 return false;
