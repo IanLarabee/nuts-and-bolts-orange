@@ -28,117 +28,121 @@
             $time=time()-900;
             $ip_address=getIpAddr();
 
-            $query=mysqli_query($conn,"select count(*) as total_count from loginlogs where TryTime > $time and IpAddress='$ip_address'");
-            $check_login_row=mysqli_fetch_assoc($query);
-            $total_count=$check_login_row['total_count'];
+            $username = $_POST['username'];
+            $password = $_POST['password'];
 
-            if($total_count==3)
+            //Prevent SQL Injection
+            $username = stripcslashes($username);  
+            $password = stripcslashes($password);  
+            $username = mysqli_real_escape_string($conn, $username);  
+            $password = mysqli_real_escape_string($conn, $password);
+
+            if(empty($username) || empty($password))
             {
-                array_push($errors, "Too many failed login attempts. Please try again after 15 minutes.");
+                array_push($errors, "All fields are required");
             }
-            else
+            else 
             {
+                
+                $stmt = $conn->prepare("SELECT id, first_name, username, password FROM employees WHERE username=?");
+                $stmt->bind_param("s", $username);
 
-                $username = $_POST['username'];
-                $password = $_POST['password'];
-
-                //Prevent SQL Injection
-                $username = stripcslashes($username);  
-                $password = stripcslashes($password);  
-                $username = mysqli_real_escape_string($conn, $username);  
-                $password = mysqli_real_escape_string($conn, $password);
-
-                if(empty($username) || empty($password))
+                if($stmt->execute())
                 {
-                    array_push($errors, "All fields are required");
-                }
-                else 
-                {
-                    //$hash = password_hash($password, PASSWORD_BCRYPT);
+                    $stmt->store_result();
 
-                    $stmt = $conn->prepare("SELECT id, first_name, username, password FROM employees WHERE username=?");
-                    $stmt->bind_param("s", $username);
-
-                    if($stmt->execute())
+                    if ($stmt->num_rows == 1)
                     {
-                        $stmt->store_result();
+                        $stmt->bind_result($id, $firstName, $username, $hash);
 
-                        if ($stmt->num_rows == 1)
+                        if($stmt->fetch())
                         {
-                            $stmt->bind_result($id, $firstName, $username, $hash);
-
-                            if($stmt->fetch())
+                            //$query=mysqli_query($conn,"select count(*) as total_count from loginlogs where TryTime > $time and user_id='$id'");
+                            //$check_login_row=mysqli_fetch_assoc($query);
+                            //$total_count=$check_login_row['total_count'];
+                                    
+                            /*if($total_count==3)
                             {
-                                if(password_verify($password, $hash))
-                                {
-                                    session_start();
-
-                                    $_SESSION['isEmployee'] = true;
-                                    $_SESSION['userId'] = $id;
-                                    $_SESSION['firstname'] = $firstName;
-                                    $_SESSION['username'] = $username;
-                                    mysqli_query($conn,"delete from loginlogs where IpAddress='$ip_address'");
-                                    $stmt->close();
-                                    $conn->close();
-                                    header("Location: index.php");
-                                }
-                                else
-                                {
-                                   goto usercheck;
-                                }
+                                array_push($errors, "Too many failed login attempts. Please try again after 15 minutes.");
                             }
-                        } 
-                        else
-                        {
-                            usercheck:
-                            
-                            $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username=?");
-                            $stmt->bind_param("s", $username);
-
-                            if($stmt->execute())
+                            else*/ if(password_verify($password, $hash))
                             {
-                                $stmt->store_result();
+                                session_start();
 
-                                if ($stmt->num_rows == 1)
-                                {
-                                    $stmt->bind_result($id, $username, $hash);
-
-                                    if($stmt->fetch())
-                                    {
-                                        if(password_verify($password, $hash))
-                                        {
-                                            session_start();
-
-                                            $_SESSION['isUser'] = true;
-                                            $_SESSION['userId'] = $id;
-                                            $_SESSION['username'] = $username;
-                                            mysqli_query($conn,"delete from loginlogs where IpAddress='$ip_address'");
-                                            $stmt->close();
-                                            $conn->close();
-                                            header("Location: index.php");
-                                        }
-                                        else
-                                        {
-                                            array_push($errors, "Invalid username or password");
-                                            $total_count++;
-                                            $rem_attm=3-$total_count;
-
-                                            if($rem_attm==0)
-                                            {
-                                                array_push($errors, "Too many failed login attempts. Please login after 15 minutes");
-                                            }
-
-                                            $try_time=time();
-                                            mysqli_query($conn,"insert into loginlogs(IpAddress,TryTime) values('$ip_address','$try_time')");
-                                        }
-                                    }
-                                } 
+                                $_SESSION['isEmployee'] = true;
+                                $_SESSION['userId'] = $id;
+                                $_SESSION['firstname'] = $firstName;
+                                $_SESSION['username'] = $username;
+                                mysqli_query($conn,"delete from loginlogs where user_id='$id'");
+                                $stmt->close();
+                                $conn->close();
+                                header("Location: index.php");
+                            }
+                            else
+                            {
+                                goto usercheck;
                             }
                         }
+                    } 
+                    else
+                    {
+                        usercheck:
+
+                        $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username=?");
+                        $stmt->bind_param("s", $username);
+
+                        if($stmt->execute())
+                        {
+                            $stmt->store_result();
+
+                            if ($stmt->num_rows == 1)
+                            {
+                                $stmt->bind_result($id, $username, $hash);
+
+                                if($stmt->fetch())
+                                {
+                                    $query=mysqli_query($conn,"select count(*) as total_count from loginlogs where TryTime > $time and user_id='$id'");
+                                    $check_login_row=mysqli_fetch_assoc($query);
+                                    $total_count=$check_login_row['total_count'];
+
+                                    if($total_count==3)
+                                    {
+                                        array_push($errors, "Too many failed login attempts. Please try again after 15 minutes.");
+                                    }
+                                    else if(password_verify($password, $hash))
+                                    {
+                                        session_start();
+
+                                        $_SESSION['isUser'] = true;
+                                        $_SESSION['userId'] = $id;
+                                        $_SESSION['username'] = $username;
+                                        mysqli_query($conn,"delete from loginlogs where user_id='$id'");
+                                        $stmt->close();
+                                        $conn->close();
+                                        header("Location: index.php");
+                                    }
+                                    else
+                                    {
+                                        array_push($errors, "Invalid username or password");
+                                        $total_count++;
+                                        $rem_attm=3-$total_count;
+
+                                        if($rem_attm==0)
+                                        {
+                                            array_push($errors, "Too many failed login attempts. Please login after 15 minutes");
+                                        }
+
+                                        $try_time=time();
+                                        mysqli_query($conn,"insert into loginlogs(IpAddress,TryTime,user_id) values('$ip_address','$try_time','$id')");
+                                    }
+                                }
+                            } 
+                        }
                     }
-                         
-                    }
-                } 
+                }
+                        
+                }
+                 
             } catch (Exception $e) {
                 array_push($errors, "An unexpected error has occurred. Please login again");
             }   
