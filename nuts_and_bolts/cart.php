@@ -8,6 +8,10 @@
         $userLoggedIn = false;
         $employeeLoggedIn = false;
     }
+
+	if (isset($_GET['cmd']) && $_GET['cmd']){
+		$_SESSION['cart'] = array();
+	}
 ?>
 <?php require_once "include/header.php"; ?>
 
@@ -55,3 +59,10 @@
 				</div>
 			</div>
 		</nav>
+
+		<div class="container">
+            <h1>Cart</h1>
+			<a href="cart.php?cmd=true">Remove All Products from Cart</a>
+		</div>
+		
+<?php require_once "include/footer.php"; ?>
