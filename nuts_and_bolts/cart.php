@@ -9,13 +9,18 @@
         $employeeLoggedIn = false;
     }
 
-	if (isset($_GET['cmd']) && $_GET['cmd']){
+	if (isset($_POST['cmd']) && $_POST['cmd']){
 		$_SESSION['cart'] = array();
+		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
 	}
+
+	if(isset($_POST['delete'])) {
+        unset($_SESSION['cart'][$_POST['delete']]);
+		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
+    }
 ?>
 <?php require_once "include/header.php" ?>
 <?php require_once "config/connect.php" ?>
-
 		<title>Your Cart</title>
 
         </head>
@@ -69,17 +74,17 @@
 				$total = 0;
 				echo(
 					"<div class='card-body'>
-					<div class='table-responsive'>
-					<table class='table table-bordered m-0'>
-						<thead>
-						<tr>
-							<th class='text-center py-3 px-4' style='min-width: 400px;'>Product</th>
-							<th class='text-right py-3 px-4' style='width: 100px;'>Price</th>
-							<th class='text-center py-3 px-4' style='width: 120px;'>Quantity</th>
-							<th class='text-right py-3 px-4' style='width: 100px;'>Subtotal</th>
-						</tr>
-						</thead>
-						<tbody>"
+						<div class='table-responsive'>
+								<table class='table table-bordered m-0'>
+									<thead>
+										<tr>
+											<th class='text-center py-3 px-4' style='min-width: 400px;'>Product</th>
+											<th class='text-right py-3 px-4' style='width: 100px;'>Price</th>
+											<th class='text-center py-3 px-4' style='width: 120px;'>Quantity</th>
+											<th class='text-right py-3 px-4' style='width: 100px;'>Subtotal</th>
+										</tr>
+									</thead>
+									<tbody>"
 					);
 		
 				foreach($_SESSION['cart'] as $sku => $qty) {
@@ -98,34 +103,41 @@
 					$total = $total + $subtotal;
 
 					echo(
-						"<tr>
-						<td class='p-4'>
-						<div class='media align-items-center'>
-							<div class='media-body'>
-							<strong>$name</strong>
-							<br>
-							<small>
-							<span class='text-muted'>$description</span>
-							</small>
-							</div>
-						</div>
-						</td>
-						<td class='text-right font-weight-semibold align-middle p-4'>$$price</td>
-						<td class='align-middle p-4'>$qty</td>
-						<td class='text-right font-weight-semibold align-middle p-4'>$$subtotal</td>
-						</tr>"
+						"<form action='cart.php' method='POST'>
+							<tr>
+								<td class='p-4'>
+									<div class='media align-items-center'>
+										<div class='media-body'>
+											<strong>$name</strong>
+											<br>
+											<small>
+												<span class='text-muted'>$description</span>
+											</small>
+											<input name='delete' value='$sku' style='display: none;'>
+											<button class='btn btn-secondary btn-sm delete' type='submit' style='float: right;'>Remove from cart</button>
+										</div>
+									</div>
+								</td>
+								<td class='text-right font-weight-semibold align-middle p-4'>$$price</td>
+								<td class='align-middle p-4'>$qty</td>
+								<td class='text-right font-weight-semibold align-middle p-4'>$$subtotal</td>
+							</tr>
+							</form>"
 					);
 				  }
 				}
 				echo(
-					"</tbody>
-					</table>
-					</div>
+					"		</tbody>
+							</table>
+						</div>
 						<div class='text-right mt-4'>
-						<h4><strong>Total price:</strong> $$total</h4>
+							<h4><strong>Total price:</strong> $$total</h4>
 						</div>
 					</div>
-					<a class='btn btn-primary select' href='cart.php?cmd=true'>Clear Cart</a>"
+					<form action='cart.php' method='POST'>
+						<input name='cmd' value='true' style='display: none;'>
+						<button class='btn btn-primary' type='submit'>Clear Cart</button>
+					</form>"
 				);
 			} else {
 				?>
