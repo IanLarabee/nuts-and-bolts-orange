@@ -106,6 +106,9 @@
                                 <div class="card-body">
                                     <p class="card-text">$' . $row['price'] . '</p>
                                 </div>
+                                <div class="card-body">
+                                    <p class="card-text">' . $row['quantity']. ' in stock</p>
+                                </div>
                                 <div class="card-body row">
                                     <button class="btn btn-primary select" type="submit">Add to Cart</button>
                                 </div>
