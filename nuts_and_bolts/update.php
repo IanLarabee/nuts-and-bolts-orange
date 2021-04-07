@@ -25,11 +25,12 @@
     $sku = '';
     $desc = '';
     $price = '';
+    $quantity = '';
     $selectSKU = '';
     $result = mysqli_query($conn, "SELECT * FROM inventory LIMIT 0,0");
     $rows = array();
 
-    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'');
+    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'');
     
     if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
         ;
@@ -70,6 +71,7 @@
                 $_SESSION['sku'] = $rows[0]['sku'];
                 $desc = $rows[0]['description'];
                 $price = $rows[0]['price'];
+                $quantity = $rows[0]['quantity'];
             }
         }
     }
@@ -113,20 +115,32 @@
             }
         }
 
+        if(empty($_POST['quantity'])) {
+            $errors['quantity'] = 'A product quantity is required';
+        } else {
+            $price = $_POST['quantity'];
+            if(!is_numeric($price)){
+                $errors['quantity'] = 'The product quantity must be a numeric value';
+            }
+        }
+
         if(!array_filter($errors)) {
-            $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=? WHERE sku=?");
-            $stmt->bind_param("sssds", $name, $sku, $desc, $price, $selectSKU);
+            $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=?, quantity=? WHERE sku=?");
+            $stmt->bind_param("sssdis", $name, $sku, $desc, $price, $quantity, $selectSKU);
 
             $name = mysqli_real_escape_string($conn, $_POST['name']);
             $sku = mysqli_real_escape_string($conn, $_POST['sku']);
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
+            $quantity = mysqli_real_escape_string($conn, $_POST['quantity']);
             $selectSKU = $_SESSION['sku'];
 
             $name = stripslashes($name);
             $sku = stripslashes($sku);
             $desc = stripslashes($desc);
             $price = stripslashes($price);
+            $quantity = stripslashes($quantity);
+
 
             if($stmt->execute()) {
                 $_SESSION['updateStatus'] = true;
@@ -155,6 +169,7 @@
                             $("#productName").val(row.product_name);
                             $("#productSKU").val(row.sku);
                             $("#productPrice").val(row.price);
+                            $("#productQuantity").val(row.quantity);
                             $("#productDescription").text(row.description);
                         }
                     });
@@ -271,6 +286,16 @@
                                 <?php echo $errors['desc']; ?>
                             </span>
                         </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="productQuantity" class="form-label">Quantity:</label>
+                            <div class="input-group mb-3">
+                                <input type="number" class="form-control" id="productQuantity" name="quantity" value="<?php echo htmlspecialchars($quantity); ?>">
+                            </div>
+                            <span class="text-danger">
+                                <?php echo $errors['quantity']; ?>
+                            </span>
+                        </div>
                         
                         <?php                
                             if(count($rows) > 1 && !isset($_POST['update'])) {
@@ -288,6 +313,9 @@
                                             <ul class="h-100 list-group list-group-flush">
                                                 <li class="list-group-item">' . $rows[$item]['description'] . '</li>
                                             </ul>
+                                            <div class="card-body">
+                                            <p class="card-text">Quantity: ' . $rows[$item]['quantity'] . '</p>
+                                            </div>
                                             <div class="card-body">
                                                 <p class="card-text">$' . $rows[$item]['price'] . '</p>
                                                 <button class="btn btn-primary select" type="button" value="'.$rows[$item]['sku'].'">Select</button>
