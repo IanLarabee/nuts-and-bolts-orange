@@ -110,7 +110,7 @@
                                     <p class="card-text">' . $row['quantity']. ' in stock</p>
                                 </div>
                                 <div class="card-body row">
-                                    <button class="btn btn-primary select" type="submit">Add to Cart</button>
+                                    ' .($row['quantity'] > 0 ? '<button class="btn btn-primary select" type="submit">Add to Cart</button>' : '<p class="text-danger">Out of stock</p>'). '
                                 </div>
                             </div>
                         </div>
