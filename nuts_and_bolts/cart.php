@@ -9,7 +9,7 @@
         $employeeLoggedIn = false;
     }
 
-	if (isset($_POST['cmd']) && $_POST['cmd']){
+	if(isset($_POST['clear'])){
 		$_SESSION['cart'] = array();
 		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
 	}
@@ -69,12 +69,6 @@
 
 		<div class="container">
             <h1>Cart</h1>
-
-			<?php if (count($errors) > 0): ?>
-                <?php foreach ($errors as $error): ?>
-                    <span class="text-danger"><?=$error?></span><br>
-                <?php endforeach; ?>
-            <?php endif; ?>
 			
 			<?php
 			if(isset($_SESSION['cart']) && count($_SESSION['cart']) != 0) {
@@ -147,8 +141,7 @@
 					</div>
 	
 					<form action='cart.php' method='POST'>
-						<input name='cmd' value='true' style='display: none;'>
-						<button class='btn btn-primary' type='submit'>Clear Cart</button>
+						<input class='btn btn-primary' type='submit' name='clear' value='Clear Cart'>
 					</form>
 
 					<form action='checkout.php' method='POST'>
