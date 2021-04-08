@@ -1,6 +1,11 @@
 <?php require_once "config/connect.php"; ?>
 <?php
     session_start();
+                       
+    $userid = $_SESSION['userId'];
+    $total = $_SESSION['total'];
+    $receiptid = uniqid ($prefix = "$userid-");
+    $_SESSION['receiptID'] = $receiptid;
 
     foreach($_SESSION['cart'] as $sku => $qty)
     {
@@ -21,5 +26,8 @@
             exit();
         }
     }
+    mysqli_query($conn,"INSERT INTO check_out_history(user_id, total_purchase, receipt_id) VALUES('$userid', '$total', '$receiptid')");
     $_SESSION['cart'] = array();
+    header("location: receipt.php", true, 303);
+    exit();
 ?>
