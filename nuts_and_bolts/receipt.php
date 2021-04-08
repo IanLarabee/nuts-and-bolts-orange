@@ -64,8 +64,7 @@
 		</nav>
 
 		<div class="container">
-			<!--Fetch receipt number from DB-->
-            <h1>Receipt #:</h1>
+            <h1>Receipt #: <?php echo($_SESSION['receiptID'])?></h1>
 			<div class='card-body'>
 						<div class='table-responsive'>
 								<table class='table table-bordered m-0'>
@@ -126,5 +125,7 @@
 				);
 				?>
 		</div>
-<?php unset($_SESSION['cart']); ?>		
+<?php 
+	unset($_SESSION['cart']);
+	unset ($_SESSION['receiptID']); ?>		
 <?php require_once "include/footer.php"; ?>
