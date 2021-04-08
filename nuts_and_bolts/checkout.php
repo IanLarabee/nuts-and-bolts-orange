@@ -21,7 +21,7 @@
         }
         else
         {
-            $_SESSION['cartStatus'] = "Oops! We don't have enough of the product " . $row['product_name'] . " to fulfill your order. Please try ordering a smaller quantity";
+            $_SESSION['cartStatus'] = "Oops! We don't have enough of the product '" . $row['product_name'] . "' to fulfill your order. Please try ordering a smaller quantity";
             header("Location: cart.php", true, 303);
             exit();
         }

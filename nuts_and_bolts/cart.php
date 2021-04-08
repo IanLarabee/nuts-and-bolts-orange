@@ -147,16 +147,11 @@
 								<a class='btn btn-primary' href='checkout.php' style='float:right;' role='button'>Checkout</a>
 							</div>
 						</div>
+						<form action='cart.php' method='POST'>
+							<input name='cmd' value='true' style='display: none;'>
+							<button class='btn btn-primary' type='submit'>Clear Cart</button>
+						</form>
 					</div>
-	
-					<form action='cart.php' method='POST'>
-						<input name='cmd' value='true' style='display: none;'>
-						<button class='btn btn-primary' type='submit'>Clear Cart</button>
-					</form>
-
-					<form action='checkout.php' method='POST'>
-						<button class='btn btn-primary' type='submit'>Checkout</button>
-					</form>
 					"
 				);
 			} else {
@@ -168,7 +163,7 @@
 			}
 			if(isset($_SESSION["cartStatus"])) {
 			?>
-				<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<div class="alert alert-danger alert-dismissible fade show" style="margin-top: 1.7em;" role="alert">
 					<?php echo $_SESSION["cartStatus"]; ?>
 					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>
