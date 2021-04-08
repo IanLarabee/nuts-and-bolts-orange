@@ -1,9 +1,6 @@
 <?php
     session_start();
 
-	$errors = [];
-	
-
     if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
         $userLoggedIn = $_SESSION['isUser'];
         $employeeLoggedIn = $_SESSION['isEmployee'];
