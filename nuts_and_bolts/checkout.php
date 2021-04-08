@@ -27,7 +27,6 @@
         }
     }
     mysqli_query($conn,"INSERT INTO check_out_history(user_id, total_purchase, receipt_id) VALUES('$userid', '$total', '$receiptid')");
-    $_SESSION['cart'] = array();
     header("location: receipt.php", true, 303);
     exit();
 ?>

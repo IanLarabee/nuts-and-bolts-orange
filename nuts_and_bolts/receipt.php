@@ -8,10 +8,6 @@
         $userLoggedIn = false;
         $employeeLoggedIn = false;
     }
-
-	if (isset($_GET['cmd']) && $_GET['cmd']){
-		$_SESSION['cart'] = array();
-	}
 	$total = 0
 ?>
 <?php require_once "include/header.php" ?>

@@ -132,21 +132,22 @@
 								</table>
 						</div>
 						<br>
-						<div class='row' style='float:right;>
-							<div class ='col-lg-12'>
-								<h4><strong>Total price:</strong> $$total</h4>				
-								<a class='btn btn-primary' href='checkout.php' style='float:right;' role='button'>Checkout</a>
+						<div class='row'>
+							<div class='col-md-2'>
+								<form action='cart.php' method='POST'>
+									<input class='btn btn-danger' type='submit' name='clear' value='Clear Cart'>
+								</form>
+							</div>
+							<div class='col-md-2 ms-auto'>
+								<h4><strong>Total price:</strong> $$total</h4>
+							</div>				
+						</div>
+						<div class='row'>
+							<div class='col-md-1 ms-auto'>
+								<a class='btn btn-primary' href='checkout.php' role='button'>Checkout</a>
 							</div>
 						</div>
 					</div>
-	
-					<form action='cart.php' method='POST'>
-						<input class='btn btn-primary' type='submit' name='clear' value='Clear Cart'>
-					</form>
-
-					<form action='checkout.php' method='POST'>
-						<button class='btn btn-primary' type='submit'>Checkout</button>
-					</form>
 					"
 				);
 			} else {
