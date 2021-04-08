@@ -1,11 +1,23 @@
 <?php require_once "config/connect.php"; ?>
 <?php
     session_start();
-                       
-    $userid = $_SESSION['userId'];
-    $total = $_SESSION['total'];
-    $receiptid = uniqid ($prefix = "$userid-");
+
+    //3 happens to be our guest user id
+    $userid = 3;
+
+    if(isset($_SESSION['userId'])) {
+        $userid = $_SESSION['userId'];
+    }
+
+    $receiptid = uniqid($userid);
     $_SESSION['receiptID'] = $receiptid;
+
+    if(isset($_SESSION['username'])) {
+        $username = $_SESSION['username'];
+        mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate) VALUES ('$receiptid', '$username', NOW())");
+    } else {
+        mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate) VALUES ('$receiptid', 'guest', NOW())");
+    }
 
     foreach($_SESSION['cart'] as $sku => $qty)
     {
@@ -18,6 +30,7 @@
         {
             $c_sql = "UPDATE inventory SET quantity = quantity-$qty WHERE sku=$sku";
             mysqli_query($conn, $c_sql);
+            mysqli_query($conn,"INSERT INTO receipt_details(receiptId, sku, quantity) VALUES ('$receiptid', '$sku', '$qty')");
         }
         else
         {
@@ -26,7 +39,7 @@
             exit();
         }
     }
-    mysqli_query($conn,"INSERT INTO check_out_history(user_id, total_purchase, receipt_id) VALUES('$userid', '$total', '$receiptid')");
+
     header("location: receipt.php", true, 303);
     exit();
 ?>

@@ -133,14 +133,17 @@
 						</div>
 						<br>
 						<div class='row'>
-							<div class='col-md-2'>
+							<div class='col-md-3'>
 								<form action='cart.php' method='POST'>
 									<input class='btn btn-danger' type='submit' name='clear' value='Clear Cart'>
 								</form>
 							</div>
-							<div class='col-md-2 ms-auto'>
-								<h4><strong>Total price:</strong> $$total</h4>
-							</div>				
+							<div class='col-md-8 text-end'>
+								<h4><strong>Total price:</strong></h4>
+							</div>
+							<div class='col-md-1 ms-auto text-end'>
+								<h4>$$total</h4>
+							</div>			
 						</div>
 						<div class='row'>
 							<div class='col-md-1 ms-auto'>

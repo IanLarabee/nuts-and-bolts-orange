@@ -123,5 +123,5 @@
 		</div>
 <?php 
 	unset($_SESSION['cart']);
-	unset ($_SESSION['receiptID']); ?>		
+	unset($_SESSION['receiptID']); ?>		
 <?php require_once "include/footer.php"; ?>

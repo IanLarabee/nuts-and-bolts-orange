@@ -84,10 +84,6 @@
 
         <div class = "container">
             <h1>Products</h1>
-
-            <div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
-                <span id="alert-message"></span>
-            </div>
             
             <div class = "row row-cols-1 row-cols-md-4 g-3">
 
@@ -125,7 +121,10 @@
             echo '</div>';
             mysqli_close($conn);
             ?>
-                
+                <br>
+                <div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
+                    <span id="alert-message"></span>
+                </div>
             </div>  
         </div>
 
