@@ -129,7 +129,8 @@
 				unset($_SESSION['receiptID']); 
 			} else { ?>
 				<div class="alert alert-secondary" role="alert">
-					No checkout has been made recently!
+					<span>No checkout has been made recently!</span>
 				</div>
 			<?php } ?>
+		</div>
 <?php require_once "include/footer.php"; ?>
