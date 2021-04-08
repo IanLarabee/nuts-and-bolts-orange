@@ -22,8 +22,8 @@
 		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
     }
 ?>
-<?php require_once "include/header.php" ?>
-<?php require_once "config/connect.php" ?>
+<?php require_once "include/header.php"; ?>
+<?php require_once "config/connect.php"; ?>
 		<title>Your Cart</title>
 
         </head>
@@ -162,7 +162,16 @@
 				</div>
 				<?php 
 			}
-				?>
+			if(isset($_SESSION["cartStatus"])) {
+			?>
+				<div class="alert alert-danger alert-dismissible fade show" role="alert">
+					<?php echo $_SESSION["cartStatus"]; ?>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			<?php
+				unset($_SESSION["cartStatus"]); 
+				}
+			?>
 		</div>
 		
 <?php require_once "include/footer.php"; ?>

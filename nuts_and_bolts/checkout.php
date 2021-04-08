@@ -1,10 +1,7 @@
+<?php require_once "include/header.php"; ?>
 <?php require_once "config/connect.php"; ?>
-<?php require_once "cart.php"; ?>
 <?php
-
-    function GoToCart() {
-        echo '<script language="javascript">window.location.href ="cart.php"</script>';
-    }
+    session_start();
 
     foreach($_SESSION['cart'] as $sku => $qty)
     {
@@ -17,13 +14,13 @@
         {
             $c_sql = "UPDATE inventory SET quantity = quantity-$qty WHERE sku=$sku";
             mysqli_query($conn, $c_sql);
-            $_SESSION['cart'] = array();
         }
         else
         {
-            array_push($errors, "Oops! We don't have enough of the product " . $row['product_name'] . " to fulfill your order. Please try ordering a smaller quantity");
-            GoToCart();
-            
+            $_SESSION['cartStatus'] = "Oops! We don't have enough of the product " . $row['product_name'] . " to fulfill your order. Please try ordering a smaller quantity";
+            header("Location: cart.php", true, 303);
+            exit();
         }
     }
+    $_SESSION['cart'] = array();
 ?>
