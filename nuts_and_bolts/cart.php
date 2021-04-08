@@ -127,17 +127,21 @@
 				  }
 				}
 				echo(
-					"		</tbody>
-							</table>
+					"				</tbody>
+								</table>
 						</div>
-						<div class='text-right mt-4'>
-							<h4><strong>Total price:</strong> $$total</h4>
+						<br>
+						<div class='row' style='float:right;>
+							<div class ='col-lg-12'>
+								<h4><strong>Total price:</strong> $$total</h4>				
+								<a class='btn btn-primary' href='checkout.php' style='float:right;' role='button'>Checkout</a>
+							</div>
 						</div>
-					</div>
-					<form action='cart.php' method='POST'>
+						<form action='cart.php' method='POST'>
 						<input name='cmd' value='true' style='display: none;'>
-						<button class='btn btn-primary' type='submit'>Clear Cart</button>
-					</form>"
+						<button class='btn btn-danger' type='submit'>Clear Cart</button>
+						</form>
+					</div>"
 				);
 			} else {
 				?>
