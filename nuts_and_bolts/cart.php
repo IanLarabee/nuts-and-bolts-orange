@@ -1,6 +1,9 @@
 <?php
     session_start();
 
+	$errors = [];
+	
+
     if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
         $userLoggedIn = $_SESSION['isUser'];
         $employeeLoggedIn = $_SESSION['isEmployee'];
@@ -19,8 +22,8 @@
 		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
     }
 ?>
-<?php require_once "include/header.php" ?>
-<?php require_once "config/connect.php" ?>
+<?php require_once "include/header.php"; ?>
+<?php require_once "config/connect.php"; ?>
 		<title>Your Cart</title>
 
         </head>
@@ -69,6 +72,13 @@
 
 		<div class="container">
             <h1>Cart</h1>
+
+			<?php if (count($errors) > 0): ?>
+                <?php foreach ($errors as $error): ?>
+                    <span class="text-danger"><?=$error?></span><br>
+                <?php endforeach; ?>
+            <?php endif; ?>
+			
 			<?php
 			if(isset($_SESSION['cart']) && count($_SESSION['cart']) != 0) {
 				$total = 0;
@@ -137,11 +147,17 @@
 								<a class='btn btn-primary' href='checkout.php' style='float:right;' role='button'>Checkout</a>
 							</div>
 						</div>
-						<form action='cart.php' method='POST'>
+					</div>
+	
+					<form action='cart.php' method='POST'>
 						<input name='cmd' value='true' style='display: none;'>
-						<button class='btn btn-danger' type='submit'>Clear Cart</button>
-						</form>
-					</div>"
+						<button class='btn btn-primary' type='submit'>Clear Cart</button>
+					</form>
+
+					<form action='checkout.php' method='POST'>
+						<button class='btn btn-primary' type='submit'>Checkout</button>
+					</form>
+					"
 				);
 			} else {
 				?>
@@ -150,7 +166,16 @@
 				</div>
 				<?php 
 			}
-				?>
+			if(isset($_SESSION["cartStatus"])) {
+			?>
+				<div class="alert alert-danger alert-dismissible fade show" role="alert">
+					<?php echo $_SESSION["cartStatus"]; ?>
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>
+			<?php
+				unset($_SESSION["cartStatus"]); 
+				}
+			?>
 		</div>
 		
 <?php require_once "include/footer.php"; ?>

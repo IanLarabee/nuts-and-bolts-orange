@@ -29,6 +29,9 @@
                     success: function(){
                         $("div[class='alert alert-success alert-dismissible fade show']").show();
                         $('#alert-message').text($(this).find('.card-title').text() + " was added to your cart.");
+                        <?php
+                            //$newSku = key($_SESSION['cart'][count($_SESSION['cart']) - 1]);
+                        ?>
                     }
                 });
                 return false;
@@ -81,7 +84,7 @@
 
         <div class = "container">
             <h1>Products</h1>
-            
+
             <div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
                 <span id="alert-message"></span>
             </div>
