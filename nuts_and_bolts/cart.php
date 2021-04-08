@@ -1,6 +1,9 @@
 <?php
     session_start();
 
+	$errors = [];
+	
+
     if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
         $userLoggedIn = $_SESSION['isUser'];
         $employeeLoggedIn = $_SESSION['isEmployee'];
@@ -69,6 +72,13 @@
 
 		<div class="container">
             <h1>Cart</h1>
+
+			<?php if (count($errors) > 0): ?>
+                <?php foreach ($errors as $error): ?>
+                    <span class="text-danger"><?=$error?></span><br>
+                <?php endforeach; ?>
+            <?php endif; ?>
+			
 			<?php
 			if(isset($_SESSION['cart']) && count($_SESSION['cart']) != 0) {
 				$total = 0;
@@ -134,10 +144,16 @@
 							<h4><strong>Total price:</strong> $$total</h4>
 						</div>
 					</div>
+	
 					<form action='cart.php' method='POST'>
 						<input name='cmd' value='true' style='display: none;'>
 						<button class='btn btn-primary' type='submit'>Clear Cart</button>
-					</form>"
+					</form>
+
+					<form action='checkout.php' method='POST'>
+						<button class='btn btn-primary' type='submit'>Checkout</button>
+					</form>
+					"
 				);
 			} else {
 				?>
