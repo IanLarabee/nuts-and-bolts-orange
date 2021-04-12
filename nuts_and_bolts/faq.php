@@ -28,7 +28,6 @@
 						<a class="nav-link" href="products.php">Products</a>
 						<a class="nav-link active" aria-current="page" href="faq.php">FAQ</a>
 						<a class="nav-link" href="contact.php">Contact Us</a>
-
 					  	<?php if($employeeLoggedIn): ?>
 							<a class="nav-link" href="add.php">Add Products</a>
 							<a class="nav-link" href="update.php">Update Products</a>
@@ -38,7 +37,6 @@
 					<div class="navbar-nav ms-auto flex-nowrap">
 					<?php if($userLoggedIn): ?>
                         <?php echo '<span class="nav-link">'. $_SESSION['username'] . '</span>' ?>
-						<a class="nav-link" href="history.php">Order History</a>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php elseif($employeeLoggedIn): ?>
