@@ -9,18 +9,13 @@
         $employeeLoggedIn = false;
     }
 
-	if(isset($_POST['clear'])){
+	if (isset($_GET['cmd']) && $_GET['cmd']){
 		$_SESSION['cart'] = array();
-		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
 	}
-
-	if(isset($_POST['delete'])) {
-        unset($_SESSION['cart'][$_POST['delete']]);
-		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
-    }
 ?>
-<?php require_once "include/header.php"; ?>
-<?php require_once "config/connect.php"; ?>
+<?php require_once "include/header.php" ?>
+<?php require_once "config/connect.php" ?>
+
 		<title>Your Cart</title>
 
         </head>
@@ -38,6 +33,7 @@
 						<a class="nav-link" href="products.php">Products</a>
 						<a class="nav-link" href="faq.php">FAQ</a>
 						<a class="nav-link" href="contact.php">Contact Us</a>
+						
                 
 					  	<?php if($employeeLoggedIn): ?>
 							<a class="nav-link" href="add.php">Add Products</a>
@@ -48,7 +44,9 @@
 					<div class="navbar-nav ms-auto flex-nowrap">
 					<?php if($userLoggedIn): ?>
                         <?php echo '<span class="nav-link">'. $_SESSION['username'] . '</span>' ?>
+						<a class="nav-link" href="history.php">Order History</a>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+						
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php elseif($employeeLoggedIn): ?>
                         <?php echo '<span class="nav-link">'. $_SESSION['firstname'] . '</span>' ?>
@@ -69,23 +67,22 @@
 
 		<div class="container">
             <h1>Cart</h1>
-			
 			<?php
 			if(isset($_SESSION['cart']) && count($_SESSION['cart']) != 0) {
 				$total = 0;
 				echo(
 					"<div class='card-body'>
-						<div class='table-responsive'>
-								<table class='table table-bordered m-0'>
-									<thead>
-										<tr>
-											<th class='text-center py-3 px-4' style='min-width: 400px;'>Product</th>
-											<th class='text-right py-3 px-4' style='width: 100px;'>Price</th>
-											<th class='text-center py-3 px-4' style='width: 120px;'>Quantity</th>
-											<th class='text-right py-3 px-4' style='width: 100px;'>Subtotal</th>
-										</tr>
-									</thead>
-									<tbody>"
+					<div class='table-responsive'>
+					<table class='table table-bordered m-0'>
+						<thead>
+						<tr>
+							<th class='text-center py-3 px-4' style='min-width: 400px;'>Product</th>
+							<th class='text-right py-3 px-4' style='width: 100px;'>Price</th>
+							<th class='text-center py-3 px-4' style='width: 120px;'>Quantity</th>
+							<th class='text-right py-3 px-4' style='width: 100px;'>Subtotal</th>
+						</tr>
+						</thead>
+						<tbody>"
 					);
 		
 				foreach($_SESSION['cart'] as $sku => $qty) {
@@ -104,54 +101,34 @@
 					$total = $total + $subtotal;
 
 					echo(
-						"<form action='cart.php' method='POST'>
-							<tr>
-								<td class='p-4'>
-									<div class='media align-items-center'>
-										<div class='media-body'>
-											<strong>$name</strong>
-											<br>
-											<small>
-												<span class='text-muted'>$description</span>
-											</small>
-											<input name='delete' value='$sku' style='display: none;'>
-											<button class='btn btn-secondary btn-sm delete' type='submit' style='float: right;'>Remove from cart</button>
-										</div>
-									</div>
-								</td>
-								<td class='text-right font-weight-semibold align-middle p-4'>$$price</td>
-								<td class='align-middle p-4'>$qty</td>
-								<td class='text-right font-weight-semibold align-middle p-4'>$$subtotal</td>
-							</tr>
-							</form>"
+						"<tr>
+						<td class='p-4'>
+						<div class='media align-items-center'>
+							<div class='media-body'>
+							<strong>$name</strong>
+							<br>
+							<small>
+							<span class='text-muted'>$description</span>
+							</small>
+							</div>
+						</div>
+						</td>
+						<td class='text-right font-weight-semibold align-middle p-4'>$$price</td>
+						<td class='align-middle p-4'>$qty</td>
+						<td class='text-right font-weight-semibold align-middle p-4'>$$subtotal</td>
+						</tr>"
 					);
 				  }
 				}
 				echo(
-					"				</tbody>
-								</table>
-						</div>
-						<br>
-						<div class='row'>
-							<div class='col-md-3'>
-								<form action='cart.php' method='POST'>
-									<input class='btn btn-danger' type='submit' name='clear' value='Clear Cart'>
-								</form>
-							</div>
-							<div class='col-md-8 text-end'>
-								<h4><strong>Total price:</strong></h4>
-							</div>
-							<div class='col-md-1 ms-auto text-end'>
-								<h4>$$total</h4>
-							</div>			
-						</div>
-						<div class='row'>
-							<div class='col-md-1 ms-auto'>
-								<a class='btn btn-primary' href='checkout.php' role='button'>Checkout</a>
-							</div>
+					"</tbody>
+					</table>
+					</div>
+						<div class='text-right mt-4'>
+						<h4><strong>Total price:</strong> $$total</h4>
 						</div>
 					</div>
-					"
+					<a class='btn btn-primary select' href='cart.php?cmd=true'>Clear Cart</a>"
 				);
 			} else {
 				?>
@@ -160,16 +137,7 @@
 				</div>
 				<?php 
 			}
-			if(isset($_SESSION["cartStatus"])) {
-			?>
-				<div class="alert alert-danger alert-dismissible fade show" role="alert">
-					<?php echo $_SESSION["cartStatus"]; ?>
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-			<?php
-				unset($_SESSION["cartStatus"]); 
-				}
-			?>
+				?>
 		</div>
 		
 <?php require_once "include/footer.php"; ?>

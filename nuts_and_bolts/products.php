@@ -29,9 +29,6 @@
                     success: function(){
                         $("div[class='alert alert-success alert-dismissible fade show']").show();
                         $('#alert-message').text($(this).find('.card-title').text() + " was added to your cart.");
-                        <?php
-                            //$newSku = key($_SESSION['cart'][count($_SESSION['cart']) - 1]);
-                        ?>
                     }
                 });
                 return false;
@@ -54,6 +51,7 @@
                         <a class="nav-link active" aria-current="page" href="products.php">Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
+                        
                         <?php if($employeeLoggedIn): ?>
                             <a class="nav-link" href="add.php">Add Products</a>
                             <a class="nav-link" href="update.php">Update Products</a>
@@ -63,6 +61,7 @@
                     <div class="navbar-nav ms-auto flex-nowrap">
                     <?php if($userLoggedIn): ?>
                         <?php echo '<span class="nav-link">'. $_SESSION['username'] . '</span>' ?>
+                        <a class="nav-link" href="history.php">Order History</a>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php elseif($employeeLoggedIn): ?>
@@ -85,13 +84,20 @@
         <div class = "container">
             <h1>Products</h1>
             
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
+                <span id="alert-message"></span>
+            </div>
+
             <div class = "row row-cols-1 row-cols-md-4 g-3">
 
             <?php $result = mysqli_query($conn, "SELECT * FROM inventory"); ?>
-    
+            
             <?php 
+
             while($row = mysqli_fetch_array($result))
+
             {
+                $count = 0;
                 echo '<div class = "col">
                     <form class="product-card">
                         <div class="card h-100">
@@ -108,23 +114,39 @@
                                 <div class="card-body">
                                     <p class="card-text">' . $row['quantity']. ' in stock</p>
                                 </div>
+                                ';
+                                    
+                                if($row['quantity']>"0")
+                
+                                echo ' 
                                 <div class="card-body row">
-                                    ' .($row['quantity'] > 0 ? '<button class="btn btn-primary select" type="submit">Add to Cart</button>' : '<p class="text-danger">Out of stock</p>'). '
-                                </div>
+                                    <button class="btn btn-primary select" type="submit">Add to Cart</button> 
+                                   
+                                 </div>
+                                 ';
+                            
+                                else
+                               
+                                echo 
+                                ' <footer>
+                                <h2>out of stock</h2>';
+                        
+                    echo '
                             </div>
                         </div>
                     </form>'
+                
+                
                 ;
-
+                
+                
             }
-
+            
             echo '</div>';
             mysqli_close($conn);
             ?>
-                <br>
-                <div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none;">
-                    <span id="alert-message"></span>
-                </div>
+                
+            
             </div>  
         </div>
 

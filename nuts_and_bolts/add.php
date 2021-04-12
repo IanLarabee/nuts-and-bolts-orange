@@ -16,10 +16,9 @@
     $sku = '';
     $desc = '';
     $price = '';
-    $quantity = 1;
     $success = '';
 
-    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'');
+    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'');
 
     if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
         ;
@@ -75,31 +74,20 @@
             }
         }
 
-        if(empty($_POST['quantity'])) {
-            $errors['quantity'] = 'A product quantity is required';
-        } else {
-            $quantity = $_POST['quantity'];
-            if(!is_numeric($quantity)){
-                $errors['quantity'] = 'The product quantity must be a numeric value';
-            }
-        }
-
         if(!array_filter($errors)) {
             
-            $stmt = $conn->prepare("INSERT INTO inventory(product_name, sku, description, price) VALUES(?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssdi", $name, $sku, $desc, $price, $quantity);
+            $stmt = $conn->prepare("INSERT INTO inventory(product_name, sku, description, price) VALUES(?, ?, ?, ?)");
+            $stmt->bind_param("sssd", $name, $sku, $desc, $price);
 
             $name = mysqli_real_escape_string($conn, $_POST['name']);
             $sku = mysqli_real_escape_string($conn, $_POST['sku']);
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
-            $quantity = mysqli_real_escape_string($conn, $_POST['quantity']);
 
             $name = stripslashes($name);
             $sku = stripslashes($sku);
             $desc = stripslashes($desc);
             $price = stripslashes($price);
-            $quantity = stripslashes($quantity);
 
             if($stmt->execute()) {
                 $_SESSION['postStatus'] = true;
@@ -135,11 +123,13 @@
                         <a class="nav-link" href="update.php">Update Products</a>
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
+                        
                     </div>
                     <div class="navbar-nav ms-auto flex-nowrap">
                     <?php if($userLoggedIn): ?>
                         <?php echo '<span class="nav-link">'. $_SESSION['username'] . '</span>' ?>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
+                        <a class="nav-link" href="history.php">Order History</a>
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php elseif($employeeLoggedIn): ?>
                         <?php echo '<span class="nav-link">'. $_SESSION['firstname'] . '</span>' ?>
@@ -194,13 +184,6 @@
                         <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"><?php echo htmlspecialchars($desc); ?></textarea>
                         <span class="text-danger">
                             <?php echo $errors['desc']; ?>
-                        </span>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="productQuantity" class="form-label">Quantity:</label>
-                        <input type="number" class="form-control" name="quantity" id="productQuantity" value="1">
-                        <span class="text-danger">
-                            <?php echo $errors['quantity']; ?>
                         </span>
                     </div>
                     <button class="btn btn-primary" type="submit" name="submit">Submit</button>
