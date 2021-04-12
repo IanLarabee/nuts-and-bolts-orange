@@ -63,6 +63,7 @@
                     <div class="navbar-nav ms-auto flex-nowrap">
                     <?php if($userLoggedIn): ?>
                         <?php echo '<span class="nav-link">'. $_SESSION['username'] . '</span>' ?>
+                        <a class="nav-link" href="history.php">Order History</a>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php elseif($employeeLoggedIn): ?>
