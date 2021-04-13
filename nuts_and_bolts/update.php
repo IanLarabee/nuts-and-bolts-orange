@@ -26,11 +26,12 @@
     $desc = '';
     $price = '';
     $quantity = '';
+    $category = '';
     $selectSKU = '';
     $result = mysqli_query($conn, "SELECT * FROM inventory LIMIT 0,0");
     $rows = array();
 
-    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'');
+    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'', 'category'=>'');
     
     if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
         ;
@@ -72,6 +73,7 @@
                 $desc = $rows[0]['description'];
                 $price = $rows[0]['price'];
                 $quantity = $rows[0]['quantity'];
+                $category = $rows[0]['category_id'];
             }
         }
     }
@@ -124,15 +126,22 @@
             }
         }
 
+        if(empty($_POST['category'])) {
+            $errors['category'] = 'A product category is required';
+        } else {
+            $category = $_POST['category'];
+        }
+
         if(!array_filter($errors)) {
-            $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=?, quantity=? WHERE sku=?");
-            $stmt->bind_param("sssdis", $name, $sku, $desc, $price, $quantity, $selectSKU);
+            $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=?, quantity=?, category_id=? WHERE sku=?");
+            $stmt->bind_param("sssdiis", $name, $sku, $desc, $price, $quantity, $category, $selectSKU);
 
             $name = mysqli_real_escape_string($conn, $_POST['name']);
             $sku = mysqli_real_escape_string($conn, $_POST['sku']);
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
             $quantity = mysqli_real_escape_string($conn, $_POST['quantity']);
+            $category = mysqli_real_escape_string($conn, $_POST['category']);
             $selectSKU = $_SESSION['sku'];
 
             $name = stripslashes($name);
@@ -140,7 +149,7 @@
             $desc = stripslashes($desc);
             $price = stripslashes($price);
             $quantity = stripslashes($quantity);
-
+            $category = stripslashes($category);
 
             if($stmt->execute()) {
                 $_SESSION['updateStatus'] = true;
@@ -170,6 +179,7 @@
                             $("#productSKU").val(row.sku);
                             $("#productPrice").val(row.price);
                             $("#productQuantity").val(row.quantity);
+                            $("#productCategory").val(row.category_id);
                             $("#productDescription").text(row.description);
                         }
                     });
@@ -296,6 +306,21 @@
                                 <?php echo $errors['quantity']; ?>
                             </span>
                         </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="productCategory" class="form-label">Category:</label>
+                            <select name="category" id="productCategory" class="form-control" value="<?php echo htmlspecialchars($category); ?>">
+                                <?php $result = mysqli_query($conn, "SELECT * FROM categories");
+
+                                    while($row = mysqli_fetch_array($result)){
+                                        echo '<option value="' . $row['id'] . '">' . $row['name'] . '</option>';
+                                    }
+                                ?>  
+                            </select>
+                            <span class="text-danger">
+                                <?php echo $errors['category']; ?>
+                            </span>
+                        </div>
                         
                         <?php                
                             if(count($rows) > 1 && !isset($_POST['update'])) {
@@ -315,6 +340,9 @@
                                             </ul>
                                             <div class="card-body">
                                             <p class="card-text">Quantity: ' . $rows[$item]['quantity'] . '</p>
+                                            </div>
+                                            <div class="card-body">
+                                            <p class="card-text">Category: ' . $rows[$item]['category_id'] . '</p>
                                             </div>
                                             <div class="card-body">
                                                 <p class="card-text">$' . $rows[$item]['price'] . '</p>
