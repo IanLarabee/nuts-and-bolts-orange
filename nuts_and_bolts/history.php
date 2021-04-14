@@ -8,8 +8,16 @@
         $userLoggedIn = false;
         $employeeLoggedIn = false;
     }
+
+    if(!isset($_SESSION['username']) || $_SESSION['username'] == '') {
+        $_SESSION['loginmessage'] = true;
+        header("Location: login.php", true, 303);
+    }
+
+    $receiptTotal = 0;
 ?>
 <?php require_once "include/header.php"; ?>
+<?php require_once "config/connect.php" ?>
 
 		<title>Order History | Nuts and Bolts</title>
 
@@ -80,6 +88,101 @@
                 </div>
             </div>
         </nav>
+        
+        <div class="container">
+            
+            <h1>Order History</h1>
+            
+            <?php
+                $receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate FROM receipts WHERE username = \''.$_SESSION['username'].'\' ORDER BY saleDate DESC');
+                while($reciept = mysqli_fetch_array($receiptsResult)) {
+                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
+                    
+                    while($recieptDetails = mysqli_fetch_array($receiptDetailsResult)) {
+                        $receiptTotal =+ $recieptDetails['quantity'] * $recieptDetails['salePrice'];
+                    }
+
+                    echo '
+                        <div class="row">
+                            <div class="col">
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <div class="row row-cols-auto">
+                                            <div class="col border-end">
+                                                <div class="row">
+                                                    <span><small class="text-muted">Order Placed</small></span>
+                                                </div>
+                                                <div class="row">
+                                                    <span>'.date_format(date_create($reciept['saleDate']), "n/j/y").'</span>
+                                                </div>
+                                            </div>
+                                            <div class="col me-auto">
+                                                <div class="row">
+                                                    <span><small class="text-muted">Total</small></span>
+                                                </div>
+                                                <div class="row">
+                                                    <span>$'.$receiptTotal.'</span>
+                                                </div>
+                                            </div>
+                                            <div class="col ms-auto">
+                                                <div class="row">
+                                                    <span class="text-end"><small class="text-muted">Receipt ID</small></span>
+                                                </div>
+                                                <div class="row">
+                                                    <span class="text-end">'.$reciept['receiptId'].'</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="container">';
+
+                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
+                    
+                    while($recieptDetails = mysqli_fetch_array($receiptDetailsResult)) {
+                        $productDetails = mysqli_query($conn, 'SELECT product_name, price FROM inventory WHERE sku = \''.$recieptDetails['sku'].'\'');
+                        
+                        if(mysqli_num_rows($productDetails) == 0) {
+                            echo '
+                                <div class="row row-cols-auto g-0 border-bottom">
+                                    <div class="col p-3">
+                                        <img class="img-fluid" style="width:100px;">
+                                    </div>
+                                    <div class="col me-auto">
+                                        <div class="card-body">
+                                            <h5 class="card-title">This Item No Longer Exists</h5>
+                                            <p class="card-text"><small class="text-muted">Price Not Available</small></p>
+                                        </div>
+                                    </div>
+                                </div>';
+
+                            continue;
+                        }
+                        
+                        $productDetails = mysqli_fetch_array($productDetails);
+                        
+                        echo '
+                            <div class="row row-cols-auto g-0 border-bottom">
+                                <div class="col p-3">
+                                    <img class="img-fluid" style="width:100px;">
+                                </div>
+                                <div class="col me-auto">
+                                    <div class="card-body">
+                                        <h5 class="card-title">'.$productDetails['product_name'].'</h5>
+                                        <p class="card-text"><small class="text-muted">'.$productDetails['price'].'</small></p>
+                                    </div>
+                                </div>
+                            </div>';
+                    }
+                    
+                    echo '</div>
+                                </div>
+                            </div>
+                        </div>';
+                    
+                    $receiptTotal = 0;
+                }
+            ?>
+        </div>
 
 <?php require_once "include/footer.php"; ?>
         
