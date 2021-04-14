@@ -208,17 +208,6 @@
         </div>
     </nav>
 
-    <!--display message if redirected from add/update products-->
-    <?php if (isset($_SESSION['loginmessage'])) {
-    ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            You must be logged in as an employee to access this page.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <?php unset($_SESSION['loginmessage']);
-    }
-    ?>   
-
     <div class="container">
         <h1>Login</h1>
         
@@ -240,7 +229,18 @@
                 </div>
                 <!--login button -->
                 <button class="btn btn-primary" type="submit" name="submit">Login</button>
-            </form>
+
+                <!--display message if redirected from add/update products-->
+                <?php if (isset($_SESSION['loginmessage'])) {
+                ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        You do not have access to this page currently.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php unset($_SESSION['loginmessage']);
+                }
+                ?> 
+            </form>  
         </div>
     </div>
 
