@@ -174,6 +174,10 @@
 								<a class='btn btn-primary' href='checkout.php' role='button'>Checkout</a>
 							</div>
 						</div>
+						<form action='cart.php' method='POST'>
+							<input name='cmd' value='true' style='display: none;'>
+							<button class='btn btn-primary' type='submit'>Clear Cart</button>
+						</form>
 					</div>
 					"
 				);
@@ -186,7 +190,7 @@
 			}
 			if(isset($_SESSION["cartStatus"])) {
 			?>
-				<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<div class="alert alert-danger alert-dismissible fade show" style="margin-top: 1.7em;" role="alert">
 					<?php echo $_SESSION["cartStatus"]; ?>
 					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>

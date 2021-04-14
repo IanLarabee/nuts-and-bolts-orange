@@ -17,9 +17,10 @@
     $desc = '';
     $price = '';
     $quantity = 1;
+    $category = '';
     $success = '';
 
-    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'');
+    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'', 'category'=> '');
 
     if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
         ;
@@ -84,22 +85,30 @@
             }
         }
 
+        if(empty($_POST['category'])) {
+            $errors['category'] = 'A product category is required';
+        } else {
+            $category = $_POST['category'];
+        }
+
         if(!array_filter($errors)) {
             
-            $stmt = $conn->prepare("INSERT INTO inventory(product_name, sku, description, price) VALUES(?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssdi", $name, $sku, $desc, $price, $quantity);
+            $stmt = $conn->prepare("INSERT INTO inventory(product_name, sku, description, price, quantity, category_id) VALUES(?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssdii", $name, $sku, $desc, $price, $quantity, $category);
 
             $name = mysqli_real_escape_string($conn, $_POST['name']);
             $sku = mysqli_real_escape_string($conn, $_POST['sku']);
             $desc = mysqli_real_escape_string($conn, $_POST['desc']);
             $price = mysqli_real_escape_string($conn, $_POST['price']);
             $quantity = mysqli_real_escape_string($conn, $_POST['quantity']);
+            $category = mysqli_real_escape_string($conn, $_POST['category']);
 
             $name = stripslashes($name);
             $sku = stripslashes($sku);
             $desc = stripslashes($desc);
             $price = stripslashes($price);
             $quantity = stripslashes($quantity);
+            $category = stripslashes($category);
 
             if($stmt->execute()) {
                 $_SESSION['postStatus'] = true;
@@ -227,6 +236,21 @@
                         <input type="number" class="form-control" name="quantity" id="productQuantity" value="1">
                         <span class="text-danger">
                             <?php echo $errors['quantity']; ?>
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="productCategory" class="form-label">Category:</label>
+                        <select name="category" id="productCategory" class="form-control" value="<?php echo htmlspecialchars($category); ?>">
+                            <?php $result = mysqli_query($conn, "SELECT * FROM categories");
+
+                                while($row = mysqli_fetch_array($result)){
+                                    echo '<option value="' . $row['id'] . '">' . $row['name'] . '</option>';
+                                }
+                            ?>  
+                        </select>
+                        <a href="addCategory.php"><button type="button" class="btn btn-secondary" style="margin-top: 0.5em;">Add Category</button></a>
+                        <span class="text-danger">
+                            <?php echo $errors['category']; ?>
                         </span>
                     </div>
                     <button class="btn btn-primary" type="submit" name="submit">Submit</button>
