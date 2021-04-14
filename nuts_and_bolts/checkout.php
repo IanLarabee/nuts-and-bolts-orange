@@ -28,9 +28,10 @@
 
         if($row['quantity'] >= $qty)
         {
+            $salePrice = $row['price'];
             $c_sql = "UPDATE inventory SET quantity = quantity-$qty WHERE sku=$sku";
             mysqli_query($conn, $c_sql);
-            mysqli_query($conn,"INSERT INTO receipt_details(receiptId, sku, quantity) VALUES ('$receiptid', '$sku', '$qty')");
+            mysqli_query($conn,"INSERT INTO receipt_details(receiptId, sku, quantity, salePrice) VALUES ('$receiptid', '$sku', '$qty', '$salePrice')");
         }
         else
         {
