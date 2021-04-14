@@ -168,6 +168,7 @@
                                 <div class="col me-auto">
                                     <div class="card-body">
                                         <h5 class="card-title">'.$productDetails['product_name'].'</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">Quantity: '.$recieptDetails['quantity'].'</h6>
                                         <p class="card-text"><small class="text-muted">'.$productDetails['price'].'</small></p>
                                     </div>
                                 </div>
