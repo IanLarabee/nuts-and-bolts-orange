@@ -174,10 +174,6 @@
 								<a class='btn btn-primary' href='checkout.php' role='button'>Checkout</a>
 							</div>
 						</div>
-						<form action='cart.php' method='POST'>
-							<input name='cmd' value='true' style='display: none;'>
-							<button class='btn btn-primary' type='submit'>Clear Cart</button>
-						</form>
 					</div>
 					"
 				);
