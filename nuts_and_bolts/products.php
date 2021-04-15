@@ -112,11 +112,21 @@
             
             <div class = "row row-cols-1 row-cols-md-4 g-3">
 
-            <?php $result = mysqli_query($conn, "SELECT * FROM inventory"); ?>
-    
+            <?php $result = mysqli_query($conn, "SELECT inventory.product_id, inventory.product_name, inventory.sku, inventory.description, inventory.price, inventory.quantity, categories.name as catname, categories.id as catid FROM inventory LEFT JOIN categories ON (inventory.category_id=categories.id) ORDER BY categories.name ASC"); ?>
+            
+
             <?php 
+
+            $currentCategory = 0;
             while($row = mysqli_fetch_array($result))
             {
+
+                if($currentCategory != $row['catid'])
+                {
+                    echo '</div><div class="row">
+                    <h3 style="padding: 0.5em 0.5em 0.5em 0.5em">' . $row['catname'] . '</h3>';
+                    $currentCategory = $row['catid'];
+                }
                 echo '<div class = "col">
                     <form class="product-card">
                         <div class="card h-100">
