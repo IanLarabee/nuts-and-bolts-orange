@@ -95,6 +95,13 @@
             
             <?php
                 $receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate FROM receipts WHERE username = \''.$_SESSION['username'].'\' ORDER BY saleDate DESC');
+                if(mysqli_num_rows($receiptsResult) == 0) {
+                    echo '
+                        <div class="alert alert-secondary" role="alert">
+					        <span>No order history found!</span>
+				        </div>
+                    ';
+                }
                 while($reciept = mysqli_fetch_array($receiptsResult)) {
                     $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
                     
