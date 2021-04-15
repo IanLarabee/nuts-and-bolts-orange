@@ -11,6 +11,7 @@
 ?>
 
 <?php require_once "include/header.php"; ?>
+<?php require_once "config/connect.php" ?>
 
 <title>Weekly Sales Report | Nuts and Bolts</title>
 </head>
@@ -82,4 +83,77 @@
             </div>
         </nav>
 
+        <!--Table begins here -->
+    <br>
+    <div class="container">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                <th scope="col">Product Id</th>
+                <th scope="col">Product Name</th>
+                <th scope="col"><?php echo date('m/d/y', strtotime('-1 days')); ?></th>
+                <th scope="col"><?php echo date('m/d/y', strtotime('-2 days')); ?></th>
+                <th scope="col"><?php echo date('m/d/y', strtotime('-3 days')); ?></th>
+                <th scope="col"><?php echo date('m/d/y', strtotime('-4 days')); ?></th>
+                <th scope="col"><?php echo date('m/d/y', strtotime('-5 days')); ?></th>
+                <th scope="col"><?php echo date('m/d/y', strtotime('-6 days')); ?></th>
+                <th scope="col"><?php echo date('m/d/y', strtotime('-7 days')); ?></th>
+                </tr>
+            </thead>
+
+            <!-- PHP begins here-->
+            <?php  
+            
+                $query = "SELECT product_id, product_name, saleDate, quantity FROM inventory, receipts";
+                $result = mysqli_query($conn, $query);
+
+                if(mysqli_num_rows($result) >= 1){
+
+                $row = mysqli_fetch_array($result);
+
+                $product_id = $row['product_id'];
+                $product_name = $row['product_name'];
+                $sale_date = $row['saleDate'];
+                $quantity = $row['quantity'];
+
+
+                echo("
+
+                <tbody>
+                    <tr>
+                        <th scope='row'>$product_id</th><!-- product id goes here-->
+                        <td>$product_name</td><!-- product_name goes here-->
+                        <td>$quantity</td><!--receipts.saleDAte goes here-->
+                        <td>$quantity</td>
+                        <td>$quantity</td>
+                        <td>$quantity</td>
+                        <td>$quantity</td>
+                        <td>$quantity</td>
+                        <td>$quantity</td>
+                    </tr>
+
+
+
+                    <!--<tr>
+                        <th scope='row'>$product_id</th>
+                        <td>$product_name</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                    </tr>
+                    <tr>
+                        <th scope='row'>3</th>
+                        <td colspan='2'>Larry the Bird</td>
+                        <td>@twitter</td>
+                    </tr>-->
+                </tbody>
+                        
+                
+                
+                ");
+                }
+                
+
+            ?>
+        </table>
+    </div>
 <?php require_once "include/footer.php"; ?>
