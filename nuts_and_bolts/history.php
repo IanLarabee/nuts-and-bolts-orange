@@ -182,7 +182,11 @@
                             </div>';
                     }
                     
-                    echo '</div>
+                    echo '
+                                    </div>
+                                    <div class="card-body">
+                                        <a class="card-text text-muted" href="receipt.php?receiptID='.$reciept['receiptId'].'">More Details</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>';
