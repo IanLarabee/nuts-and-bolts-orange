@@ -107,9 +107,11 @@
                 $query = "SELECT product_id, product_name, saleDate, quantity FROM inventory, receipts";
                 $result = mysqli_query($conn, $query);
 
-                if(mysqli_num_rows($result) >= 1){
-
                 $row = mysqli_fetch_array($result);
+
+                foreach ($row as $query_result){
+
+                
 
                 $product_id = $row['product_id'];
                 $product_name = $row['product_name'];
@@ -131,20 +133,6 @@
                         <td>$quantity</td>
                         <td>$quantity</td>
                     </tr>
-
-
-
-                    <!--<tr>
-                        <th scope='row'>$product_id</th>
-                        <td>$product_name</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope='row'>3</th>
-                        <td colspan='2'>Larry the Bird</td>
-                        <td>@twitter</td>
-                    </tr>-->
                 </tbody>
                         
                 
