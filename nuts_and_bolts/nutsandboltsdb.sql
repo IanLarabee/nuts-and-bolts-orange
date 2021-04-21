@@ -16,6 +16,15 @@ CREATE TABLE if not exists `categories`(
 `name` varchar(255) not null
 );
 
+CREATE TABLE if not exists `images`(
+`id` int unsigned auto_increment not null primary key,
+`filename` varchar(255) not null,
+`mimetype` varchar(50) not null,
+`imagedata` mediumblob not null,
+`product_id` int unsigned not null,
+FOREIGN KEY (`product_id`) REFERENCES `inventory`(`product_id`)
+) engine=InnoDB;
+
 CREATE TABLE if not exists `employees` (
 	`id` int unsigned not null auto_increment primary key,
     `first_name` varchar(255) not null,
