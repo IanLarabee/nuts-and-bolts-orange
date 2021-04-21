@@ -8,6 +8,38 @@
         $userLoggedIn = false;
         $employeeLoggedIn = false;
     }
+
+    function handleImageUpload(int $productId): void {
+        try{
+            $productImage = $_FILES['productImage'];
+            $filename = $productImage['name'];
+            $size = $productImage['size'];
+            $type = $productImage['type'];
+            $tmpPath = $productImage['tmp_name'];
+
+            if (!file_exists($tmpPath)) {
+                throw new \Exception("$filename not found at temp location; bailing");
+            }
+
+            $handler = fopen($tmpPath, 'r');
+            $data = fread($handler, $size);
+            fclose($handler);
+
+            mysqli_query($conn, "DELETE FROM images WHERE product_id = $productId");
+
+            $data = mysqli_real_escape_string($conn, $data);
+            $sql = "INSERT INTO images(filename, mimetype, imagedata, product_id)
+            VALUES('$filename', '$type', $data, '$productId')";
+
+            mysqli_query($conn, $sql);
+
+            mysqli_query($conn, "i.id as `image_id`
+            LEFT JOIN image i ON inventory.product_id = i.product_id");
+
+        } catch (\Exception $e){
+            $errors['image'] = "An unexpected error has occurred while uploading the product image";
+        }
+    }
 ?>
 <?php
     require_once "config/connect.php";
@@ -20,7 +52,7 @@
     $category = '';
     $success = '';
 
-    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'', 'category'=> '');
+    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'', 'category'=> '', 'image'=> '');
 
     if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
         ;
@@ -111,6 +143,11 @@
             $category = stripslashes($category);
 
             if($stmt->execute()) {
+
+                $i_result = mysqli_query($conn, "SELECT product_id FROM inventory WHERE sku = $sku");
+                $i_row = mysqli_fetch_array($i_result);
+                $productId = $i_row['product_id'];
+                handleImageUpload($productId);
                 $_SESSION['postStatus'] = true;
                 $_SESSION['name'] = htmlspecialchars($name);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
@@ -196,7 +233,7 @@
         <div class="container">
             <h1>Add Products</h1>
             <div class="container bg-light text-dark">
-                <form class="row g-3" action="add.php" method="POST">
+                <form class="row g-3" action="add.php" method="POST" enctype="multipart/form-data">
                     <div class="form-group col-12">
                         <label for="productName" class="form-label">Product Name:</label>
                         <input type ="text" class="form-control" id="productName" name ="name" value = "<?php echo htmlspecialchars($name); ?>">
@@ -251,6 +288,13 @@
                         <a href="addCategory.php"><button type="button" class="btn btn-secondary" style="margin-top: 0.5em;">Add Category</button></a>
                         <span class="text-danger">
                             <?php echo $errors['category']; ?>
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="productImage" class="form-label">Image:</label>
+                        <input type="file" class="form-control" name="productImage" id="productImage">
+                        <span class="text-danger">
+                            <?php echo $errors['image']; ?>
                         </span>
                     </div>
                     <button class="btn btn-primary" type="submit" name="submit">Submit</button>
