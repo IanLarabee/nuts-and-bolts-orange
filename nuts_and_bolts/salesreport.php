@@ -1,3 +1,4 @@
+<?php require_once "config/connect.php" ?>
 <?php
     session_start();
 
@@ -8,15 +9,152 @@
         $userLoggedIn = false;
         $employeeLoggedIn = false;
     }
+
+    if(isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == false) {
+        $_SESSION['loginmessage'] = True;
+        header("location: login.php");
+    } 
+
+    if(isset($_POST['submit'])) {
+        $_SESSION['date'] = $_POST['dateSelect'];
+        header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
+    }
+
+    if(isset($_POST['dateSelect'])) {
+        $sales = [];
+
+        $table = '';
+
+        $formattedDate = date("m/d/y",strtotime($_POST['dateSelect']));
+
+        $yearOfSale = date("Y", strtotime($_POST['dateSelect']));
+        $weekOfDate = date("W", strtotime($_POST['dateSelect']));
+
+        $table .= '
+            <div class="table-responsive">
+                <table id="sales" class="table table-hover table-bordered">
+                    <tr class="table-secondary">
+                        <th>Product SKU</th>';
+        
+        if(date("w", strtotime($_POST['dateSelect'])) == 1) {
+            $table .= '
+                <th>'.$formattedDate.'</th>
+                <th>'.date("m/d/y", strtotime("+1 day $formattedDate")).'</th>
+                <th>'.date("m/d/y", strtotime("+2 day $formattedDate")).'</th>
+                <th>'.date("m/d/y", strtotime("+3 day $formattedDate")).'</th>
+                <th>'.date("m/d/y", strtotime("+4 day $formattedDate")).'</th>
+                <th>'.date("m/d/y", strtotime("+5 day $formattedDate")).'</th>
+                <th>'.date("m/d/y", strtotime("+6 day $formattedDate")).'</th>';
+        } else {
+            $table .= '
+            <th>'.date("m/d/y", strtotime("last monday $formattedDate")).'</th>
+            <th>'.date("m/d/y", strtotime("last monday +1 day $formattedDate")).'</th>
+            <th>'.date("m/d/y", strtotime("last monday +2 day $formattedDate")).'</th>
+            <th>'.date("m/d/y", strtotime("last monday +3 day $formattedDate")).'</th>
+            <th>'.date("m/d/y", strtotime("last monday +4 day $formattedDate")).'</th>
+            <th>'.date("m/d/y", strtotime("last monday +5 day $formattedDate")).'</th>
+            <th>'.date("m/d/y", strtotime("last monday +6 day $formattedDate")).'</th>';
+        }
+
+        $table .= '
+            </tr>
+            <tr>
+        ';
+        
+        $salesOnDate = mysqli_query($conn, "SELECT dayofweek(saleDate) as day, receiptId FROM receipts WHERE year(saleDate)='$yearOfSale' AND WEEK(saleDate)='$weekOfDate' ORDER BY day ASC");
+        
+        if(mysqli_num_rows($salesOnDate) == 0) {
+            $table = '
+                    <div class="alert alert-secondary" role="alert">
+                        <span>No sales could be found!</span>
+                    </div>
+            ';
+            echo $table;
+            exit;
+        }
+
+        while($receipts = mysqli_fetch_array($salesOnDate)) {
+            $receiptId = $receipts['receiptId'];
+            
+            $receiptDetails = mysqli_query($conn, "SELECT sku, quantity, (quantity * salePrice) as total FROM receipt_details WHERE receiptId='$receiptId'");
+            while($salesOnReceipt = mysqli_fetch_array($receiptDetails)) {
+                if(!isset($sales[$salesOnReceipt['sku']][$receipts['day']])){
+                    $sales[$salesOnReceipt['sku']][$receipts['day']] = $salesOnReceipt['total'];
+                    continue;
+                }
+                $sales[$salesOnReceipt['sku']][$receipts['day']] += $salesOnReceipt['total'];
+            }
+        }
+
+        foreach($sales as $sku => $day) {
+            $table .= '
+                <td>'.$sku.'</td>
+            ';
+
+            for($i = 2; $i <= 8; $i++) {
+                if(array_key_exists($i, $sales[$sku])){
+                    $table .= '
+                        <td>$'.$sales[$sku][$i].'</td>
+                    ';
+                } else {
+                    $table .= '
+                        <td>$0</td>
+                    ';
+                }
+            }
+
+            $table .= '
+                </tr>
+                <tr>
+            ';
+        }
+        $table .= '</table></div>';
+        echo $table;
+        exit;
+    }
 ?>
 
 <?php require_once "include/header.php"; ?>
-<?php require_once "config/connect.php"; ?>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#date-selection").on("change", function(){
 
-<title>Weekly Sales Report | Nuts and Bolts</title>
-</head>
+                var userDate = moment($(this).val());
 
-<body>
+                if(userDate.isValid()) {
+                    $.ajax({
+                        type: 'post',
+                        url: 'salesreport.php',
+                        data: {dateSelect: userDate.format("MM/DD/YYYY")},
+                        beforeSend: function() {
+                            $("#sale-table").css("visibility", "hidden");
+                            $("#load-spinner").css({
+                                "visibility": "visible",
+                                "width": "6rem",
+                                "height": "6rem"});
+                            $("#table-title").css("visibility", "hidden");
+                        },
+                        success: function(response){
+                            $("#load-spinner").css({
+                                "visibility": "hidden",
+                                "width": "0.5rem",
+                                "height": "0.5rem"});
+                            $("#table-title").css("visibility", "visible");
+                            $("#table-title").html("Sales for the week of " + userDate.format("MM/DD/YYYY"));
+                            $("#sale-table").html(response);
+                            $("#sale-table").css("visibility", "visible");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <title>Weekly Sales Report | Nuts and Bolts</title>
+    </head>
+
+    <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
@@ -84,55 +222,15 @@
         </nav>
 
         <!--Table begins here -->
-    <br>
-    <div class="container">
-    <h1>Weekly Sales Report</h1>
-        <table class="table table-hover table-bordered">
-            <thead>
-                <tr>
-                <th scope="col">Product Id</th>
-                <th scope="col">Product Name</th>
-                <th scope="col">Past week (Total)</th>
-                <th scope="col"><?php echo date('m/d/y', strtotime('-1 days')); ?></th>
-                <th scope="col"><?php echo date('m/d/y', strtotime('-2 days')); ?></th>
-                <th scope="col"><?php echo date('m/d/y', strtotime('-3 days')); ?></th>
-                <th scope="col"><?php echo date('m/d/y', strtotime('-4 days')); ?></th>
-                <th scope="col"><?php echo date('m/d/y', strtotime('-5 days')); ?></th>
-                <th scope="col"><?php echo date('m/d/y', strtotime('-6 days')); ?></th>
-                <th scope="col"><?php echo date('m/d/y', strtotime('-7 days')); ?></th>
-                </tr>
-            </thead>
-
-            <!-- PHP begins here-->
-            <?php  
-            
-            $inventory_result = mysqli_query($conn, "SELECT * FROM inventory");
-            while ($inv_row = mysqli_fetch_array($inventory_result)){
-
-                $product_id = $inv_row['product_id'];
-                $product_name = $inv_row['product_name'];
-                $sku = $inv_row['sku'];
-                echo("                
-                <tbody>
-                <tr>
-                <th scope='row'>$product_id</th>
-                <td>$product_name</td>");
-        
-                $query = "SELECT D.quantity FROM receipt_details as D INNER JOIN receipts as R ON D.receiptId = R.receiptId WHERE sku = '$sku' AND R.saleDate > now() - INTERVAL 7 day";
-                $result = mysqli_query($conn, $query);
-                $qty = 0;
-                while ($row = mysqli_fetch_assoc($result)) {
-                $quantity = $row['quantity'];
-                $qty = $qty + $quantity;
-                }
-                echo("
-                        <td>$qty</td>
-                    </tr>
-                </tbody>
-                ");
-                }
-
-            ?>
-        </table>
-    </div>
+        <div class="container">
+            <h1>Product Sales</h1>
+            <label for="date-selection">Choose date:</label>
+            <input id="date-selection" type="date" class="form-control">
+            <br>
+            <div class="d-flex justify-content-center">
+                <div id="load-spinner" class="spinner-border" role="status" style="visibility: hidden;"></div>
+            </div>
+            <h2 id="table-title"></h2>
+            <div id="sale-table"></div>
+        </div>
 <?php require_once "include/footer.php"; ?>
