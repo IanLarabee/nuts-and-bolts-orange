@@ -79,10 +79,10 @@
             $receiptDetails = mysqli_query($conn, "SELECT sku, quantity, (quantity * salePrice) as total FROM receipt_details WHERE receiptId='$receiptId'");
             while($salesOnReceipt = mysqli_fetch_array($receiptDetails)) {
                 if(!isset($sales[$salesOnReceipt['sku']][$receipts['day']])){
-                    $sales[$salesOnReceipt['sku']][$receipts['day']] = $salesOnReceipt['total'];
+                    $sales[$salesOnReceipt['sku']][$receipts['day']] = $salesOnReceipt['quantity'];
                     continue;
                 }
-                $sales[$salesOnReceipt['sku']][$receipts['day']] += $salesOnReceipt['total'];
+                $sales[$salesOnReceipt['sku']][$receipts['day']] += $salesOnReceipt['quantity'];
             }
         }
 
@@ -94,11 +94,11 @@
             for($i = 2; $i <= 8; $i++) {
                 if(array_key_exists($i, $sales[$sku])){
                     $table .= '
-                        <td>$'.$sales[$sku][$i].'</td>
+                        <td>'.$sales[$sku][$i].'</td>
                     ';
                 } else {
                     $table .= '
-                        <td>$0</td>
+                        <td>0</td>
                     ';
                 }
             }
