@@ -9,7 +9,7 @@
         $employeeLoggedIn = false;
     }
 
-    function handleImageUpload(int $productId): void {
+    function handleImageUpload(int $productId) {
         try{
             $productImage = $_FILES['productImage'];
             $filename = $productImage['name'];
@@ -21,11 +21,15 @@
                 throw new \Exception("$filename not found at temp location; bailing");
             }
 
+            $targetDir = "img/";
+            $targetFile = $targetDir . basename($filename);
+            move_uploaded_file($tmpPath, $targetFile);
+
             $handler = fopen($tmpPath, 'r');
             $data = fread($handler, $size);
             fclose($handler);
 
-            mysqli_query($conn, "DELETE FROM images WHERE product_id = $productId");
+            //mysqli_query($conn, "DELETE FROM images WHERE product_id = $productId");
 
             $data = mysqli_real_escape_string($conn, $data);
             $sql = "INSERT INTO images(filename, mimetype, imagedata, product_id)
@@ -33,8 +37,8 @@
 
             mysqli_query($conn, $sql);
 
-            mysqli_query($conn, "i.id as `image_id`
-            LEFT JOIN image i ON inventory.product_id = i.product_id");
+            mysqli_query($conn, "SELECT i.id as `image_id`
+            LEFT JOIN images i ON inventory.product_id = i.product_id");
 
         } catch (\Exception $e){
             $errors['image'] = "An unexpected error has occurred while uploading the product image";
@@ -144,7 +148,7 @@
 
             if($stmt->execute()) {
 
-                $i_result = mysqli_query($conn, "SELECT product_id FROM inventory WHERE sku = $sku");
+                $i_result = mysqli_query($conn, "SELECT * FROM inventory WHERE sku = $sku");
                 $i_row = mysqli_fetch_array($i_result);
                 $productId = $i_row['product_id'];
                 handleImageUpload($productId);
