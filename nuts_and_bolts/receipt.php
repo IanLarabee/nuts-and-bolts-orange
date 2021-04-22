@@ -183,7 +183,7 @@
                                                     <span><small class="text-muted">Order Placed</small></span>
                                                 </div>
                                                 <div class="row">
-                                                    <span>'.date_format(date_create($reciept['saleDate']), "n/j/y").'</span>
+                                                    <span>'.date_format(date_create($reciept['saleDate']), "n/d/y h:i A").'</span>
                                                 </div>
                                             </div>
                                             <div class="col me-auto">
