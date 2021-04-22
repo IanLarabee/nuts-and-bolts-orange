@@ -84,7 +84,7 @@
 		</nav>
 
 		<div class="container">
-				<h1>Receipt <?php if(isset($_SESSION['receiptID'])) { echo("#: ".$_SESSION['receiptID']);} else{ echo("#: ".$_GET['receiptID']);}?></h1>
+				<h1>Receipt <?php if(isset($_SESSION['receiptID'])) { echo("#: ".$_SESSION['receiptID']);} elseif(isset($_GET['receiptID'])){ echo("#: ".$_GET['receiptID']);}?></h1>
 				<?php
 					if(isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {	
 				?>
@@ -153,7 +153,7 @@
 				unset($_SESSION['receiptID']); 
 			}else if(isset($_GET['receiptID'])) {
 				
-				$receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate FROM receipts WHERE receiptId = \''.$_GET['receiptID'].'\' ORDER BY saleDate DESC');
+				$receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate, username FROM receipts WHERE receiptId = \''.$_GET['receiptID'].'\' ORDER BY saleDate DESC');
                 if(mysqli_num_rows($receiptsResult) == 0) {
                     echo '
                         <div class="alert alert-secondary" role="alert">
@@ -162,6 +162,10 @@
                     ';
                 }
                 while($reciept = mysqli_fetch_array($receiptsResult)) {
+                    if($reciept['username'] != $_SESSION['username']) {
+                        $_SESSION['loginmessage'] = True;
+                        header("location: login.php");
+                    }
                     $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
                     
                     while($recieptDetails = mysqli_fetch_array($receiptDetailsResult)) {
