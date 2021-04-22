@@ -1,4 +1,6 @@
 <?php
+    include "config/connect.php";
+
     session_start();
 
     if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
@@ -10,6 +12,8 @@
     }
 
     function handleImageUpload(int $productId) {
+        include "config/connect.php";
+
         try{
             $productImage = $_FILES['productImage'];
             $filename = $productImage['name'];
@@ -18,12 +22,11 @@
             $tmpPath = $productImage['tmp_name'];
 
             if (!file_exists($tmpPath)) {
-                throw new \Exception("$filename not found at temp location; bailing");
+                throw new Exception("$filename not found at temp location; bailing");
             }
 
-            $targetDir = "img/";
-            $targetFile = $targetDir . basename($filename);
-            move_uploaded_file($tmpPath, $targetFile);
+            $targetFile = basename($filename);
+            move_uploaded_file($tmpPath, "/img/$targetFile");
 
             $handler = fopen($tmpPath, 'r');
             $data = fread($handler, $size);
@@ -32,21 +35,18 @@
             //mysqli_query($conn, "DELETE FROM images WHERE product_id = $productId");
 
             $data = mysqli_real_escape_string($conn, $data);
-            $sql = "INSERT INTO images(filename, mimetype, imagedata, product_id)
-            VALUES('$filename', '$type', $data, '$productId')";
+            $sql = "INSERT INTO images(filename, mimetype, imagedata, product_id) VALUES('$filename', '$type', '$data', '$productId')";
 
             mysqli_query($conn, $sql);
 
-            mysqli_query($conn, "SELECT i.id as `image_id`
-            LEFT JOIN images i ON inventory.product_id = i.product_id");
+            //mysqli_query($conn, "SELECT i.id as `image_id` LEFT JOIN images i ON inventory.product_id = i.product_id");
 
-        } catch (\Exception $e){
+        } catch (Exception $e){
             $errors['image'] = "An unexpected error has occurred while uploading the product image";
         }
     }
 ?>
 <?php
-    require_once "config/connect.php";
 
     $name = '';
     $sku = '';
@@ -289,7 +289,6 @@
                                 }
                             ?>  
                         </select>
-                        <a href="addCategory.php"><button type="button" class="btn btn-secondary" style="margin-top: 0.5em;">Add Category</button></a>
                         <span class="text-danger">
                             <?php echo $errors['category']; ?>
                         </span>
