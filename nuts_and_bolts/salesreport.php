@@ -11,7 +11,7 @@
 ?>
 
 <?php require_once "include/header.php"; ?>
-<?php require_once "config/connect.php" ?>
+<?php require_once "config/connect.php"; ?>
 
 <title>Weekly Sales Report | Nuts and Bolts</title>
 </head>
@@ -86,11 +86,13 @@
         <!--Table begins here -->
     <br>
     <div class="container">
+    <h1>Weekly Sales Report</h1>
         <table class="table table-hover table-bordered">
             <thead>
                 <tr>
                 <th scope="col">Product Id</th>
                 <th scope="col">Product Name</th>
+                <th scope="col">Past week (Total)</th>
                 <th scope="col"><?php echo date('m/d/y', strtotime('-1 days')); ?></th>
                 <th scope="col"><?php echo date('m/d/y', strtotime('-2 days')); ?></th>
                 <th scope="col"><?php echo date('m/d/y', strtotime('-3 days')); ?></th>
@@ -104,42 +106,31 @@
             <!-- PHP begins here-->
             <?php  
             
-                $query = "SELECT product_id, product_name, saleDate, quantity FROM inventory, receipts";
-                $result = mysqli_query($conn, $query);
+            $inventory_result = mysqli_query($conn, "SELECT * FROM inventory");
+            while ($inv_row = mysqli_fetch_array($inventory_result)){
 
-                $row = mysqli_fetch_array($result);
-
-                foreach ($row as $query_result){
-
-                
-
-                $product_id = $row['product_id'];
-                $product_name = $row['product_name'];
-                $sale_date = $row['saleDate'];
-                $quantity = $row['quantity'];
-
-
-                echo("
-
+                $product_id = $inv_row['product_id'];
+                $product_name = $inv_row['product_name'];
+                $sku = $inv_row['sku'];
+                echo("                
                 <tbody>
-                    <tr>
-                        <th scope='row'>$product_id</th><!-- product id goes here-->
-                        <td>$product_name</td><!-- product_name goes here-->
-                        <td>$quantity</td><!--receipts.saleDAte goes here-->
-                        <td>$quantity</td>
-                        <td>$quantity</td>
-                        <td>$quantity</td>
-                        <td>$quantity</td>
-                        <td>$quantity</td>
-                        <td>$quantity</td>
+                <tr>
+                <th scope='row'>$product_id</th>
+                <td>$product_name</td>");
+        
+                $query = "SELECT D.quantity FROM receipt_details as D INNER JOIN receipts as R ON D.receiptId = R.receiptId WHERE sku = '$sku' AND R.saleDate > now() - INTERVAL 7 day";
+                $result = mysqli_query($conn, $query);
+                $qty = 0;
+                while ($row = mysqli_fetch_assoc($result)) {
+                $quantity = $row['quantity'];
+                $qty = $qty + $quantity;
+                }
+                echo("
+                        <td>$qty</td>
                     </tr>
                 </tbody>
-                        
-                
-                
                 ");
                 }
-                
 
             ?>
         </table>
