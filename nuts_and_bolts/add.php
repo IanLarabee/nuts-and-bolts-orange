@@ -33,7 +33,7 @@
 
             $data = mysqli_real_escape_string($conn, $data);
             $sql = "INSERT INTO images(filename, mimetype, imagedata, product_id)
-            VALUES('$filename', '$type', $data, '$productId')";
+            VALUES('$filename', '$type', '$data', '$productId')";
 
             mysqli_query($conn, $sql);
 
