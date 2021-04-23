@@ -32,14 +32,10 @@
             $data = fread($handler, $size);
             fclose($handler);
 
-            //mysqli_query($conn, "DELETE FROM images WHERE product_id = $productId");
-
             $data = mysqli_real_escape_string($conn, $data);
             $sql = "INSERT INTO images(filename, mimetype, imagedata, product_id) VALUES('$filename', '$type', '$data', '$productId')";
 
             mysqli_query($conn, $sql);
-
-            //mysqli_query($conn, "SELECT i.id as `image_id` LEFT JOIN images i ON inventory.product_id = i.product_id");
 
         } catch (Exception $e){
             $errors['image'] = "An unexpected error has occurred while uploading the product image";
@@ -74,6 +70,7 @@
     }
 
     if(isset($_POST['submit'])) {
+
         if(empty($_POST['name'])) {
             $errors['name'] = 'A product name is required';
         } else {
@@ -125,6 +122,14 @@
             $errors['category'] = 'A product category is required';
         } else {
             $category = $_POST['category'];
+        }
+
+        if($_FILES["productImage"]["error"] != 0) {
+            $errors['image'] = "Product image has failed to upload";
+        } 
+
+        if($_FILES["productImage"]["error"] == 4) {
+            $errors['image'] = "A product image is required";
         }
 
         if(!array_filter($errors)) {

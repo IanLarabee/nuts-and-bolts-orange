@@ -21,6 +21,39 @@
         return false;
     }
 
+    function handleImageUpload(int $productId) {
+        include "config/connect.php";
+
+        try{
+            $productImage = $_FILES['productImage'];
+            $filename = $productImage['name'];
+            $size = $productImage['size'];
+            $type = $productImage['type'];
+            $tmpPath = $productImage['tmp_name'];
+
+            if (!file_exists($tmpPath)) {
+                throw new Exception("$filename not found at temp location; bailing");
+            }
+
+            $targetFile = basename($filename);
+            move_uploaded_file($tmpPath, "/img/$targetFile");
+
+            $handler = fopen($tmpPath, 'r');
+            $data = fread($handler, $size);
+            fclose($handler);
+
+            mysqli_query($conn, "DELETE FROM images WHERE product_id = $productId");
+
+            $data = mysqli_real_escape_string($conn, $data);
+            $sql = "INSERT INTO images(filename, mimetype, imagedata, product_id) VALUES('$filename', '$type', '$data', '$productId')";
+
+            mysqli_query($conn, $sql);
+
+        } catch (Exception $e){
+            $errors['image'] = "An unexpected error has occurred while uploading the product image";
+        }
+    }
+
     $name = '';
     $sku = '';
     $desc = '';
@@ -31,7 +64,7 @@
     $result = mysqli_query($conn, "SELECT * FROM inventory LIMIT 0,0");
     $rows = array();
 
-    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'', 'category'=>'');
+    $errors = array('name'=>'', 'sku'=>'', 'desc'=>'', 'price'=>'', 'quantity'=>'', 'category'=>'', 'image'=>'');
     
     if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
         ;
@@ -132,6 +165,14 @@
             $category = $_POST['category'];
         }
 
+        if($_FILES["productImage"]["error"] != 0) {
+            $errors['image'] = "Product image has failed to upload";
+        } 
+
+        if($_FILES["productImage"]["error"] == 4) {
+            $errors['image'] = "A product image is required";
+        }
+
         if(!array_filter($errors)) {
             $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=?, quantity=?, category_id=? WHERE sku=?");
             $stmt->bind_param("sssdiis", $name, $sku, $desc, $price, $quantity, $category, $selectSKU);
@@ -152,6 +193,11 @@
             $category = stripslashes($category);
 
             if($stmt->execute()) {
+
+                $i_result = mysqli_query($conn, "SELECT * FROM inventory WHERE sku = $sku");
+                $i_row = mysqli_fetch_array($i_result);
+                $productId = $i_row['product_id'];
+                handleImageUpload($productId);
                 $_SESSION['updateStatus'] = true;
                 unset($_SESSION['sku']);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
@@ -260,7 +306,7 @@
         <div class="container">
             <h1>Update Products</h1>
             <div class="container bg-light text-dark">
-                <form class="row g-3" action="update.php" method="POST">
+                <form class="row g-3" action="update.php" method="POST" enctype="multipart/form-data">
                    
                     <div class="form-group col-12">
                         <label for="productName" class="form-label">Product Name:</label>
@@ -347,6 +393,14 @@
                             </select>
                             <span class="text-danger">
                                 <?php echo $errors['category']; ?>
+                            </span>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="productImage" class="form-label">Image:</label>
+                            <input type="file" class="form-control" name="productImage" id="productImage">
+                            <span class="text-danger">
+                                <?php echo $errors['image']; ?>
                             </span>
                         </div>
                         
