@@ -58,7 +58,7 @@
 ?>
 <?php require_once "include/header.php"; ?>
 
-<title>Add Products | Nuts and Bolts</title>
+<title>Add Category | Nuts and Bolts</title>
 
     </head>
     <body>
