@@ -391,7 +391,6 @@
                                     }
                                 ?>  
                             </select>
-                            <a href="addCategory.php"><button class="btn btn-secondary" style="margin: 0.25em 0.25em 0.25em 0.25em;">Add Category</button></a>
                             <span class="text-danger">
                                 <?php echo $errors['category']; ?>
                             </span>
