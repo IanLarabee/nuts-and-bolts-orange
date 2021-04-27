@@ -28,6 +28,7 @@
     $quantity = '';
     $category = '';
     $selectSKU = '';
+    $great_deal = '';
     $result = mysqli_query($conn, "SELECT * FROM inventory LIMIT 0,0");
     $rows = array();
 
@@ -74,6 +75,7 @@
                 $price = $rows[0]['price'];
                 $quantity = $rows[0]['quantity'];
                 $category = $rows[0]['category_id'];
+                $great_deal =$rows[0]['great_deal'];
             }
         }
     }
@@ -132,9 +134,15 @@
             $category = $_POST['category'];
         }
 
+        if(isset($_POST['great_deal'])) {
+            $great_deal = 1;
+        } else {
+            $great_deal = 0;
+        }
+
         if(!array_filter($errors)) {
-            $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=?, quantity=?, category_id=? WHERE sku=?");
-            $stmt->bind_param("sssdiis", $name, $sku, $desc, $price, $quantity, $category, $selectSKU);
+            $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=?, quantity=?, category_id=?, great_deal=? WHERE sku=?");
+            $stmt->bind_param("sssdiiis", $name, $sku, $desc, $price, $quantity, $category, $great_deal, $selectSKU);
 
             $name = mysqli_real_escape_string($conn, $_POST['name']);
             $sku = mysqli_real_escape_string($conn, $_POST['sku']);
@@ -142,6 +150,7 @@
             $price = mysqli_real_escape_string($conn, $_POST['price']);
             $quantity = mysqli_real_escape_string($conn, $_POST['quantity']);
             $category = mysqli_real_escape_string($conn, $_POST['category']);
+            $great_deal = mysqli_real_escape_string($conn, $_POST['great_deal']);
             $selectSKU = $_SESSION['sku'];
 
             $name = stripslashes($name);
@@ -150,6 +159,7 @@
             $price = stripslashes($price);
             $quantity = stripslashes($quantity);
             $category = stripslashes($category);
+            $great_deal = stripslashes($great_deal);
 
             if($stmt->execute()) {
                 $_SESSION['updateStatus'] = true;
@@ -181,6 +191,7 @@
                             $("#productQuantity").val(row.quantity);
                             $("#productCategory").val(row.category_id);
                             $("#productDescription").text(row.description);
+                            $("#productgreat_deal").val(row.great_deal);
                         }
                     });
                 });
@@ -316,7 +327,7 @@
                                 <?php echo $errors['price']; ?>
                             </span>
                         </div>
-                        
+
                         <div class="form-group col-12">
                             <label for="productDescription" class="form-label">Description:</label>
                             <textarea class="form-control" id="productDescription" name="desc" rows="4" cols="50"><?php echo htmlspecialchars($desc); ?></textarea>
@@ -348,6 +359,14 @@
                             <span class="text-danger">
                                 <?php echo $errors['category']; ?>
                             </span>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <label class="form-check-label" for="great_deal">Great Deal</label>
+                                    <input type="checkbox" class="form-check-input" name="great_deal" id="great_deal" value="1"
+                                    <?php if($great_deal === '1') echo 'checked="checked"';?> />
+                            </div>
                         </div>
                         
                         <?php                
