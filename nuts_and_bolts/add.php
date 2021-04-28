@@ -132,6 +132,13 @@
             $errors['image'] = "A product image is required";
         }
 
+        $allowed = array('gif', 'png', 'jpg', 'jpeg');
+        $filename = $_FILES['productImage']['name'];
+        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+        if (!in_array($ext, $allowed)) {
+            $errors['image'] = "Image file must be a .jpg, .png, or .gif";
+        }
+
         if(!array_filter($errors)) {
             
             $stmt = $conn->prepare("INSERT INTO inventory(product_name, sku, description, price, quantity, category_id) VALUES(?, ?, ?, ?, ?, ?)");
