@@ -84,10 +84,13 @@
             $errors['sku'] = 'A product SKU is required';
         } else {
             $sku = $_POST['sku'];
+            $skuQuery = mysqli_query($conn, "SELECT sku FROM inventory WHERE sku='$sku'");
             if(!preg_match('/^[0-9A-Z]{1,12}$/', $sku)){
                 $errors['sku'] = 'The product SKU must be no longer than 12 capital alphanumeric characters';
-            } else if(mysqli_fetch_assoc(mysqli_query($conn, "SELECT sku FROM inventory WHERE sku='$sku'"))["sku"] == $sku){
-                $errors['sku'] = 'This SKU already exists';
+            } else if(mysqli_num_rows($skuQuery) > 0){
+                if(mysqli_fetch_assoc($skuQuery)["sku"] == $sku && searchForSKU($sku, $rows)){
+                    $errors['sku'] = 'This SKU already exists';
+                }
             }
         }
 
