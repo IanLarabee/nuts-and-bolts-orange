@@ -168,14 +168,21 @@
             $category = $_POST['category'];
         }
 
-        if($_FILES["productImage"]["error"] != 0) {
-            $errors['image'] = "Product image has failed to upload";
-        } 
+        if(is_uploaded_file($_FILES['productImage']['tmp_name'])){
 
-        if($_FILES["productImage"]["error"] == 4) {
-            $errors['image'] = "A product image is required";
+            if($_FILES["productImage"]["error"] != 0) {
+                $errors['image'] = "Product image has failed to upload";
+            }
+
+            $allowed = array('gif', 'png', 'jpg', 'jpeg');
+            $filename = $_FILES['productImage']['name'];
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            
+            if (!in_array($ext, $allowed)) {
+                $errors['image'] = "Image file must be a .jpg, .png, or .gif";
+            }
         }
-
+        
         if(!array_filter($errors)) {
             $stmt = $conn->prepare("UPDATE inventory SET product_name=?, sku=?, description=?, price=?, quantity=?, category_id=? WHERE sku=?");
             $stmt->bind_param("sssdiis", $name, $sku, $desc, $price, $quantity, $category, $selectSKU);
@@ -197,10 +204,14 @@
 
             if($stmt->execute()) {
 
-                $i_result = mysqli_query($conn, "SELECT * FROM inventory WHERE sku = $sku");
-                $i_row = mysqli_fetch_array($i_result);
-                $productId = $i_row['product_id'];
-                handleImageUpload($productId);
+                if(is_uploaded_file($_FILES['productImage']['tmp_name']))
+                {
+                    $i_result = mysqli_query($conn, "SELECT * FROM inventory WHERE sku = $sku");
+                    $i_row = mysqli_fetch_array($i_result);
+                    $productId = $i_row['product_id'];
+                    handleImageUpload($productId);
+                }
+
                 $_SESSION['updateStatus'] = true;
                 unset($_SESSION['sku']);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
