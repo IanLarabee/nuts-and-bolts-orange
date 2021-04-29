@@ -95,6 +95,13 @@
             
             <?php
                 $receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate FROM receipts WHERE username = \''.$_SESSION['username'].'\' ORDER BY saleDate DESC');
+                if(mysqli_num_rows($receiptsResult) == 0) {
+                    echo '
+                        <div class="alert alert-secondary" role="alert">
+					        <span>No order history found!</span>
+				        </div>
+                    ';
+                }
                 while($reciept = mysqli_fetch_array($receiptsResult)) {
                     $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
                     
@@ -113,7 +120,7 @@
                                                     <span><small class="text-muted">Order Placed</small></span>
                                                 </div>
                                                 <div class="row">
-                                                    <span>'.date_format(date_create($reciept['saleDate']), "n/j/y").'</span>
+                                                    <span>'.date_format(date_create($reciept['saleDate']), "n/d/y h:i A").'</span>
                                                 </div>
                                             </div>
                                             <div class="col me-auto">
@@ -134,48 +141,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="container">';
-
-                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
-                    
-                    while($recieptDetails = mysqli_fetch_array($receiptDetailsResult)) {
-                        $productDetails = mysqli_query($conn, 'SELECT product_name, price FROM inventory WHERE sku = \''.$recieptDetails['sku'].'\'');
-                        
-                        if(mysqli_num_rows($productDetails) == 0) {
-                            echo '
-                                <div class="row row-cols-auto g-0 border-bottom">
-                                    <div class="col p-3">
-                                        <img class="img-fluid" style="width:100px;">
-                                    </div>
-                                    <div class="col me-auto">
-                                        <div class="card-body">
-                                            <h5 class="card-title">This Item No Longer Exists</h5>
-                                            <p class="card-text"><small class="text-muted">Price Not Available</small></p>
-                                        </div>
-                                    </div>
-                                </div>';
-
-                            continue;
-                        }
-                        
-                        $productDetails = mysqli_fetch_array($productDetails);
-                        
-                        echo '
-                            <div class="row row-cols-auto g-0 border-bottom">
-                                <div class="col p-3">
-                                    <img class="img-fluid" style="width:100px;">
-                                </div>
-                                <div class="col me-auto">
                                     <div class="card-body">
-                                        <h5 class="card-title">'.$productDetails['product_name'].'</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Quantity: '.$recieptDetails['quantity'].'</h6>
-                                        <p class="card-text"><small class="text-muted">'.$productDetails['price'].'</small></p>
+                                        <a class="card-text text-muted" href="receipt.php?receiptID='.$reciept['receiptId'].'">More Details</a>
                                     </div>
-                                </div>
-                            </div>';
-                    }
-                    
-                    echo '</div>
                                 </div>
                             </div>
                         </div>';
