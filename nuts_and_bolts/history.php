@@ -102,11 +102,11 @@
 				        </div>
                     ';
                 }
-                while($reciept = mysqli_fetch_array($receiptsResult)) {
-                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
+                while($receipt = mysqli_fetch_array($receiptsResult)) {
+                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$receipt['receiptId'].'\'');
                     
-                    while($recieptDetails = mysqli_fetch_array($receiptDetailsResult)) {
-                        $receiptTotal =+ $recieptDetails['quantity'] * $recieptDetails['salePrice'];
+                    while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
+                        $receiptTotal = $receiptTotal + ($receiptDetails['quantity'] * $receiptDetails['salePrice']);
                     }
 
                     echo '
@@ -120,7 +120,7 @@
                                                     <span><small class="text-muted">Order Placed</small></span>
                                                 </div>
                                                 <div class="row">
-                                                    <span>'.date_format(date_create($reciept['saleDate']), "n/d/y h:i A").'</span>
+                                                    <span>'.date_format(date_create($receipt['saleDate']), "n/d/y h:i A").'</span>
                                                 </div>
                                             </div>
                                             <div class="col me-auto">
@@ -136,13 +136,13 @@
                                                     <span class="text-end"><small class="text-muted">Receipt ID</small></span>
                                                 </div>
                                                 <div class="row">
-                                                    <span class="text-end">'.$reciept['receiptId'].'</span>
+                                                    <span class="text-end">'.$receipt['receiptId'].'</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <a class="card-text text-muted" href="receipt.php?receiptID='.$reciept['receiptId'].'">More Details</a>
+                                        <a class="card-text text-muted" href="receipt.php?receiptID='.$receipt['receiptId'].'">More Details</a>
                                     </div>
                                 </div>
                             </div>
