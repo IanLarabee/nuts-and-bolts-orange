@@ -29,9 +29,6 @@
                     success: function(){
                         $("div[class='alert alert-success alert-dismissible fade show']").show();
                         $('#alert-message').text($(this).find('.card-title').text() + " was added to your cart.");
-                        <?php
-                            //$newSku = key($_SESSION['cart'][count($_SESSION['cart']) - 1]);
-                        ?>
                     }
                 });
                 return false;
@@ -120,6 +117,10 @@
             $currentCategory = 0;
             while($row = mysqli_fetch_array($result))
             {
+                $prodId = $row['product_id'];
+                $imgSql = "SELECT * FROM images WHERE product_id = $prodId";
+                $imgResult = mysqli_query($conn, $imgSql);
+                $imgRow = $imgResult->fetch_assoc();
 
                 if($currentCategory != $row['catid'])
                 {
@@ -130,6 +131,9 @@
                 echo '<div class = "col">
                     <form class="product-card">
                         <div class="card h-100">
+                                <div class="card-body">
+                                    ' . (mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<img src="data:image/jpg;charset=utf8;base64,'. base64_encode($imgRow['imagedata']). '"  class="product-img">') . '
+                                </div>
                                 <div class="card-body">
                                     <h5 class="card-title">' . $row['product_name'] . '</h5>
                                     <p class="card-text product-sku"><small class = "text-muted">SKU: ' . $row['sku'] . '</small></p>
