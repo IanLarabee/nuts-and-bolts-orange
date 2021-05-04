@@ -10,6 +10,9 @@
     }
 ?>
 <?php require_once "include/header.php"; ?>
+<?php require_once "config/connect.php"; 
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);?>
+
 
         <title>Home | Nuts and Bolts</title>
 
@@ -82,7 +85,46 @@
         </nav>
         
         <div class="container">
-            <h1>Nuts and Bolts</h1>
-        </div>
+            <h1>Great Deals!</h1>
+
+
+            <div class = "row row-cols-1 row-cols-md-4 g-3">
+
+            <?php $result = mysqli_query($conn, "SELECT product_id, product_name, price FROM inventory WHERE great_deal = 1"); ?>
+                
+
+                <?php 
+
+                $currentCategory = 0;
+                while($row = mysqli_fetch_array($result))
+                {
+                    $prodId = $row['product_id'];
+                    $imgSql = "SELECT * FROM images WHERE product_id = $prodId";
+                    $imgResult = mysqli_query($conn, $imgSql);
+                    $imgRow = $imgResult->fetch_assoc();
+
+                    echo '<div class = "col">
+                        <form class="product-card">
+                            <div class="card h-100">
+                                    <div class="card-body">
+                                        ' . (mysqli_num_rows($imgResult) == 0 ? '<h4>Image Unavailable</h4>' : '<img src="data:image/jpg;charset=utf8;base64,'. base64_encode($imgRow['imagedata']). '"  class="product-img">') . '
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">' . $row['product_name'] . '</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">$' . $row['price'] . '</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>'
+                    ;
+
+                }
+
+                echo '</div>';
+                mysqli_close($conn);
+                ?>
+        </div>       
 
 <?php require_once "include/footer.php"; ?>
