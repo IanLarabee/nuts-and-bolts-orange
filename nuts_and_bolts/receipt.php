@@ -8,7 +8,8 @@
         $userLoggedIn = false;
         $employeeLoggedIn = false;
     }
-	$total = 0
+    $total = 0;
+	$receiptTotal = 0
 ?>
 <?php require_once "include/header.php" ?>
 <?php require_once "config/connect.php" ?>
@@ -161,15 +162,17 @@
 				        </div>
                     ';
                 }
-                while($reciept = mysqli_fetch_array($receiptsResult)) {
-                    if($reciept['username'] != $_SESSION['username']) {
+                while($receipt = mysqli_fetch_array($receiptsResult)) {
+                    
+                    if($receipt['username'] != $_SESSION['username']) {
                         $_SESSION['loginmessage'] = True;
                         header("location: login.php");
                     }
-                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
+
+                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$receipt['receiptId'].'\'');
                     
-                    while($recieptDetails = mysqli_fetch_array($receiptDetailsResult)) {
-                        $receiptTotal =+ $recieptDetails['quantity'] * $recieptDetails['salePrice'];
+                    while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
+                        $receiptTotal = $receiptTotal + ($receiptDetails['quantity'] * $receiptDetails['salePrice']);
                     }
 
                     echo '
@@ -183,7 +186,7 @@
                                                     <span><small class="text-muted">Order Placed</small></span>
                                                 </div>
                                                 <div class="row">
-                                                    <span>'.date_format(date_create($reciept['saleDate']), "n/d/y h:i A").'</span>
+                                                    <span>'.date_format(date_create($receipt['saleDate']), "n/d/y h:i A").'</span>
                                                 </div>
                                             </div>
                                             <div class="col me-auto">
@@ -199,17 +202,19 @@
                                                     <span class="text-end"><small class="text-muted">Receipt ID</small></span>
                                                 </div>
                                                 <div class="row">
-                                                    <span class="text-end">'.$reciept['receiptId'].'</span>
+                                                    <span class="text-end">'.$receipt['receiptId'].'</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="container">';
 
-                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$reciept['receiptId'].'\'');
+                    $receiptTotal = 0;
+
+                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$receipt['receiptId'].'\'');
                     
-                    while($recieptDetails = mysqli_fetch_array($receiptDetailsResult)) {
-                        $productDetails = mysqli_query($conn, 'SELECT product_name, price FROM inventory WHERE sku = \''.$recieptDetails['sku'].'\'');
+                    while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
+                        $productDetails = mysqli_query($conn, 'SELECT product_name, price FROM inventory WHERE sku = \''.$receiptDetails['sku'].'\'');
                         
                         if(mysqli_num_rows($productDetails) == 0) {
                             echo '
@@ -238,7 +243,7 @@
                                 <div class="col me-auto">
                                     <div class="card-body">
                                         <h5 class="card-title">'.$productDetails['product_name'].'</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Quantity: '.$recieptDetails['quantity'].'</h6>
+                                        <h6 class="card-subtitle mb-2 text-muted">Quantity: '.$receiptDetails['quantity'].'</h6>
                                         <p class="card-text"><small class="text-muted">'.$productDetails['price'].'</small></p>
                                     </div>
                                 </div>
@@ -250,9 +255,8 @@
                                 </div>
                             </div>
                         </div>';
-                    
-                    $receiptTotal = 0;
                 }
+
 			} 
 			else { ?>
 				<div class="alert alert-secondary" role="alert">
