@@ -19,6 +19,7 @@ h1{
 }
 
 .product-card{
+    min-height: 5em;
     max-width: max-content;
     max-height: max-content;
     padding: 0.25em 0.25em 0.25em 0.25em;
