@@ -50,8 +50,13 @@
             $errors['purchaseAmount'] = 'A total purchase amount is required';
         } else {
             $purchaseAmount = $_POST['purchaseAmount'];
-            if($purchaseAmount < 2){
+            if($purchaseAmount < 2 )
+            {
                 $errors['purchaseAmount'] = 'Total purchase amount must be greater than one dollar';
+            }
+            else if($purchaseAmount < $dollarsOff)
+            {
+                $errors['purchaseAmount'] = 'Purchase amount must be more than dollars off';
             }
         }
 
@@ -59,7 +64,8 @@
             $errors['startDate'] = "The discount's starting date is required";
         } else {
             $startDate = $_POST['startDate'];
-            if(strtotime($startDate) < strtotime('now')){
+            $today = date("Y-m-d");
+            if(strtotime($startDate) < strtotime($today)){
                 $errors['startDate'] = 'Start date must be the current date or later';
             }
         }
