@@ -77,7 +77,7 @@
         if(!array_filter($errors))
         {
             $stmt = $conn->prepare("INSERT INTO discounts(code, dollars_off, purchase_amount, start_date, end_date) VALUES(?, ?, ?, ?, ?)");
-            $stmt->bind_param("siiss", $code, $dollarsOff, $purchaseAmount, $startDate, $endDate);
+            $stmt->bind_param("sdiss", $code, $dollarsOff, $purchaseAmount, $startDate, $endDate);
 
             $code = mysqli_real_escape_string($conn, $_POST['code']);
             $dollarsOff = mysqli_real_escape_string($conn, $_POST['dollarsOff']);
