@@ -63,7 +63,7 @@
     </head>
     <body>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
                 <a class="navbar-brand" href="index.php"><img src="assets/nutsandboltslogo.png" alt="Nuts and Bolts" id="logo"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,20 +71,49 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link" href="index.php">Home</a>
-                        <a class="nav-link" href="products.php">Products</a>
-                        <a class="nav-link active" aria-current="page" href="add.php">Add Products</a>
-                        <a class="nav-link" href="update.php">Update Products</a>
+                        <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+                        <?php if($employeeLoggedIn): ?>
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Products
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+                                    <a class="dropdown-item" href="products.php">Products List</a>
+                                    <a class="dropdown-item" href="add.php">Add Products</a>
+                                    <a class="dropdown-item" href="update.php">Update Products</a>
+                                    <a class="dropdown-item" href="addCategory.php">Add Categories</a>
+                                    <a class="dropdown-item" href="salesreport.php">Product Sales</a>
+                                    <a class="dropdown-item" href="addCode.php">Add Discount Code</a>
+                                </div>
+						    </div>
+                        <?php else: ?>
+                            <a class="nav-link" href="products.php">Products</a>
+                        <?php endif; ?> 
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
                     </div>
                     <div class="navbar-nav ms-auto flex-nowrap">
                     <?php if($userLoggedIn): ?>
-                        <?php echo '<span class="nav-link">'. $_SESSION['username'] . '</span>' ?>
+                        <div class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								<?php echo '<span>'. $_SESSION['username'] . '</span>' ?>
+							</a>
+							<div class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+								<a class="dropdown-item" href="history.php">Order History</a>
+							</div>
+						</div>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php elseif($employeeLoggedIn): ?>
-                        <?php echo '<span class="nav-link">'. $_SESSION['firstname'] . '</span>' ?>
+                        <div class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								<?php echo '<span>'. $_SESSION['firstname'] . '</span>' ?>
+							</a>
+							<div class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+								<a class="dropdown-item" href="history.php">Order History</a>
+                                <a class="dropdown-item" href="register.php">Register Employees</a>
+							</div>
+						</div>
                         <span class="collapse show nav-link" id="navbarNavAltMarkup">|</span>
                         <a class="nav-link" href="logout.php">Logout</a>
                     <?php else: ?>

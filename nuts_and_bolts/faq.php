@@ -36,6 +36,7 @@
                                     <a class="dropdown-item" href="update.php">Update Products</a>
 									<a class="dropdown-item" href="addCategory.php">Add Categories</a>
                                     <a class="dropdown-item" href="salesreport.php">Product Sales</a>
+									<a class="dropdown-item" href="addCode.php">Add Discount Code</a>
                                 </div>
 						    </div>
                         <?php else: ?>
