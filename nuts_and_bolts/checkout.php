@@ -18,7 +18,7 @@
             $couponCode = $_SESSION['discountCode'];
             mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', '$username', NOW(), $couponCode)");
         } else {
-            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', '$username', NOW())");
+            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate) VALUES ('$receiptid', '$username', NOW())");
         }
     } else {
         if(isset($_SESSION['discountCode'])) {
