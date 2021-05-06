@@ -16,14 +16,14 @@
         $username = $_SESSION['username'];
         if(isset($_SESSION['discountCode'])) {
             $couponCode = $_SESSION['discountCode'];
-            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', '$username', NOW(), $couponCode)");
+            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', '$username', NOW(), '$couponCode')");
         } else {
             mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate) VALUES ('$receiptid', '$username', NOW())");
         }
     } else {
         if(isset($_SESSION['discountCode'])) {
             $couponCode = $_SESSION['discountCode'];
-            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', 'guest', NOW(), $couponCode)");
+            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', 'guest', NOW(), '$couponCode')");
         } else {
             mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate) VALUES ('$receiptid', 'guest', NOW())");
         }
