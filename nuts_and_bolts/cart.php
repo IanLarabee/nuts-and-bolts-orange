@@ -51,7 +51,12 @@
 		exit;
 	}
 
-
+	if(isset($_POST['apply'])) {
+		$_SESSION['discountCode'] = $_SESSION['discountRow']['code'];
+		$_SESSION['discount'] = $_SESSION['discountRow']['dollars_off'];
+		unset($_SESSION['discountRow']);
+		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
+	}
 ?>
 <?php require_once "include/header.php"; ?>
 		<script>
@@ -244,7 +249,7 @@
 								<h4><strong>Total price:</strong></h4>
 							</div>
 							<div>
-								<h4 id='total'>$".$total - $discount."</h4>
+								<h4 id='total'>$".$total."</h4>
 							</div>			
 						</div>
 						");
