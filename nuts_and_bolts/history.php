@@ -95,7 +95,7 @@
             <h1>Order History</h1>
             
             <?php
-                $receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate FROM receipts WHERE username = \''.$_SESSION['username'].'\' ORDER BY saleDate DESC');
+                $receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate, couponCode FROM receipts WHERE username = \''.$_SESSION['username'].'\' ORDER BY saleDate DESC');
                 if(mysqli_num_rows($receiptsResult) == 0) {
                     echo '
                         <div class="alert alert-secondary" role="alert">
@@ -108,6 +108,14 @@
                     
                     while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
                         $receiptTotal = $receiptTotal + ($receiptDetails['quantity'] * $receiptDetails['salePrice']);
+                    }
+
+                    if($receipt['couponCode'] != null) {
+                        $couponCode = $receipt['couponCode'];
+                        $couponResult = mysqli_query($conn, "SELECT dollars_off FROM discounts WHERE code = '$couponCode'");
+                        $coupon = mysqli_fetch_array($couponResult);
+
+                        $receiptTotal = $receiptTotal - $coupon['dollars_off'];
                     }
 
                     echo '

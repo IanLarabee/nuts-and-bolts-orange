@@ -1,7 +1,14 @@
+<?php require_once "config/connect.php"; ?>
 <?php
     session_start();
 
-    if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])){
+	if(isset($_SESSION['discount'])) {
+		$discount = $_SESSION['discount'];
+	} else {
+		$discount = 0;
+	}
+
+    if(isset($_SESSION['isUser']) || isset($_SESSION['isEmployee'])) {
         $userLoggedIn = $_SESSION['isUser'];
         $employeeLoggedIn = $_SESSION['isEmployee'];
     } else {
@@ -9,18 +16,73 @@
         $employeeLoggedIn = false;
     }
 
-	if(isset($_POST['clear'])){
+	if(isset($_POST['clear'])) {
 		$_SESSION['cart'] = array();
+		if(isset($_SESSION['discountCode']) || isset($_SESSION['discount'])) {
+			unset($_SESSION['discountCode']);
+			unset($_SESSION['discount']);
+		}
 		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
 	}
 
 	if(isset($_POST['delete'])) {
         unset($_SESSION['cart'][$_POST['delete']]);
+		if(isset($_SESSION['discountCode']) || isset($_SESSION['discount'])) {
+			unset($_SESSION['discountCode']);
+			unset($_SESSION['discount']);
+		}
 		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
     }
+
+	if(isset($_POST['discount'])) {
+		$discountCode = mysqli_real_escape_string($conn, $_POST['discount'][0]);
+		$discountCode = stripslashes($discountCode);
+		$cartTotal = $_POST['discount'][1];
+		$discountResult = mysqli_query($conn, "SELECT code, dollars_off FROM discounts WHERE code = '$discountCode' AND start_date < NOW() AND end_date > NOW() AND '$cartTotal' >= purchase_amount");
+		
+		if(mysqli_num_rows($discountResult) == 0) {
+			echo "fail";
+			exit;
+		}
+
+		$discountRow = mysqli_fetch_array($discountResult);
+		$_SESSION['discountRow'] = $discountRow;
+		echo json_encode($discountRow);
+		exit;
+	}
+
+	if(isset($_POST['apply'])) {
+		$_SESSION['discountCode'] = $_SESSION['discountRow']['code'];
+		$_SESSION['discount'] = $_SESSION['discountRow']['dollars_off'];
+		unset($_SESSION['discountRow']);
+		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
+	}
 ?>
 <?php require_once "include/header.php"; ?>
-<?php require_once "config/connect.php"; ?>
+		<script>
+			$(document).ready(function(){
+				$("#discount-button").on('click', function(){
+					discount = [];
+					discount[0] = $("#discount-code").val();
+					discount[1] = $("#total").text().slice(1);
+					$.ajax({
+						type: 'post',
+						url: 'cart.php',
+						data: {discount: discount},
+						success: function(response){
+							if($.trim(response) == "fail") {
+								$("#discount-error").html("This discount code is invalid");
+							} else {
+								var row = jQuery.parseJSON(response);
+								$("#discount-error").html("");
+								$(".modal-body").html("Would you like to use the discount code '" + row.code + "' for $" + row.dollars_off + " off?")
+								$("#staticBackdrop").modal('show');
+							}
+						}
+					});
+				});
+			});
+		</script>
 		<title>Your Cart</title>
 
         </head>
@@ -28,7 +90,7 @@
 
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<div class="container">
-				<a class="navbar-brand" href="index.php"><img src="assets/nutsandboltslogo.png" alt="Nuts and Bolts" id="logo"></a>
+				<a class="navbar-brand" href="index.php">Nuts and Bolts</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
@@ -95,6 +157,26 @@
 		<div class="container">
             <h1>Cart</h1>
 			
+			<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="staticBackdropLabel">Apply Discount</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							...
+						</div>
+						<div class="modal-footer">
+							<form action='cart.php' method='POST'>
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+								<input class="btn btn-success" name="apply" type="submit" value="Apply">
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			
 			<?php
 			if(isset($_SESSION['cart']) && count($_SESSION['cart']) != 0) {
 				$total = 0;
@@ -157,21 +239,41 @@
 								</table>
 						</div>
 						<br>
-						<div class='row'>
-							<div class='col-md-3'>
+						<div class='d-flex'>
+							<div class='me-auto'>
 								<form action='cart.php' method='POST'>
 									<input class='btn btn-danger' type='submit' name='clear' value='Clear Cart'>
 								</form>
 							</div>
-							<div class='col-md-8 text-end'>
+							<div>
 								<h4><strong>Total price:</strong></h4>
 							</div>
-							<div class='col-md-1 ms-auto text-end'>
-								<h4>$$total</h4>
+							<div>
+								<h4 id='total'>$".$total - $discount."</h4>
 							</div>			
 						</div>
-						<div class='row'>
-							<div class='col-md-1 ms-auto'>
+						");
+				if(isset($_SESSION['discount'])) {
+					echo ("<div class='py-2 d-flex'>
+							<div class='ms-auto'>
+								<span class='text-success' id='discount-success'>Discount Code Applied</span>
+							</div>
+						</div>");
+				} else {
+					echo(
+						"<div class='py-2 d-flex'>
+							<div class='ms-auto'>
+								<label for='discount-code'>Discount Code:</label>
+								<input id='discount-code'>
+								<button id='discount-button' class='mb-1 btn btn-success'>Check</button>
+								<br>
+								<p class='mb-0 text-danger text-end' id='discount-error'></p>
+							</div>
+						</div>");
+				}
+				echo(
+					"		<div class='d-flex'>
+							<div class='ms-auto'>
 								<a class='btn btn-primary' href='checkout.php' role='button'>Checkout</a>
 							</div>
 						</div>
@@ -181,7 +283,7 @@
 			} else {
 				?>
 				<div class="alert alert-secondary" role="alert">
-				Your cart is currently empty!
+					Your cart is currently empty!
 				</div>
 				<?php 
 			}

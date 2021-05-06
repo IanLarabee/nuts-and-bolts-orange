@@ -88,9 +88,125 @@
 		<div class="container">
 				<h1>Receipt <?php if(isset($_SESSION['receiptID'])) { echo("#: ".$_SESSION['receiptID']);} elseif(isset($_GET['receiptID'])){ echo("#: ".$_GET['receiptID']);}?></h1>
 				<?php
-					if(isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {	
-				?>
-				<div class='card-body'>
+                if(isset($_GET['receiptID'])) {	
+                    $receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate, username, couponCode FROM receipts WHERE receiptId = \''.$_GET['receiptID'].'\' ORDER BY saleDate DESC');
+                    if(mysqli_num_rows($receiptsResult) == 0) {
+                        echo '
+                            <div class="alert alert-secondary" role="alert">
+                                <span>No order history found!</span>
+                            </div>
+                        ';
+                    }
+                    while($receipt = mysqli_fetch_array($receiptsResult)) {
+                        
+                        if($receipt['username'] != $_SESSION['username']) {
+                            $_SESSION['loginmessage'] = True;
+                            header("location: login.php");
+                        }
+
+                        $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$receipt['receiptId'].'\'');
+                        
+                        while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
+                            $receiptTotal = $receiptTotal + ($receiptDetails['quantity'] * $receiptDetails['salePrice']);
+                        }
+
+                        if($receipt['couponCode'] != null) {
+                            $couponCode = $receipt['couponCode'];
+                            $couponResult = mysqli_query($conn, "SELECT dollars_off FROM discounts WHERE code = '$couponCode'");
+                            $coupon = mysqli_fetch_array($couponResult);
+
+                            $receiptTotal = $receiptTotal - $coupon['dollars_off'];
+                        }
+
+                        echo '
+                            <div class="row">
+                                <div class="col">
+                                    <div class="card mb-3">
+                                        <div class="card-header">
+                                            <div class="row row-cols-auto">
+                                                <div class="col border-end">
+                                                    <div class="row">
+                                                        <span><small class="text-muted">Order Placed</small></span>
+                                                    </div>
+                                                    <div class="row">
+                                                        <span>'.date_format(date_create($receipt['saleDate']), "n/d/y h:i A").'</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col me-auto">
+                                                    <div class="row">
+                                                        <span><small class="text-muted">Total</small></span>
+                                                    </div>
+                                                    <div class="row">
+                                                        <span>$'.$receiptTotal.'</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col ms-auto">
+                                                    <div class="row">
+                                                        <span class="text-end"><small class="text-muted">Receipt ID</small></span>
+                                                    </div>
+                                                    <div class="row">
+                                                        <span class="text-end">'.$receipt['receiptId'].'</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="container">';
+
+                        $receiptTotal = 0;
+
+                        $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$receipt['receiptId'].'\'');
+                        
+                        while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
+                            $productDetails = mysqli_query($conn, 'SELECT product_name, price FROM inventory WHERE sku = \''.$receiptDetails['sku'].'\'');
+                            
+                            if(mysqli_num_rows($productDetails) == 0) {
+                                echo '
+                                    <div class="row row-cols-auto g-0 border-bottom">
+                                        <div class="col p-3">
+                                            <img class="img-fluid" style="width:100px;">
+                                        </div>
+                                        <div class="col me-auto">
+                                            <div class="card-body">
+                                                <h5 class="card-title">This Item No Longer Exists</h5>
+                                                <p class="card-text"><small class="text-muted">Price Not Available</small></p>
+                                            </div>
+                                        </div>
+                                    </div>';
+
+                                continue;
+                            }
+                            
+                            $productDetails = mysqli_fetch_array($productDetails);
+                            
+                            echo '
+                                <div class="row row-cols-auto g-0 border-bottom">
+                                    <div class="col p-3">
+                                        <img class="img-fluid" style="width:100px;">
+                                    </div>
+                                    <div class="col me-auto">
+                                        <div class="card-body">
+                                            <h5 class="card-title">'.$productDetails['product_name'].'</h5>
+                                            <h6 class="card-subtitle mb-2 text-muted">Quantity: '.$receiptDetails['quantity'].'</h6>
+                                            <p class="card-text"><small class="text-muted">'.$productDetails['price'].'</small></p>
+                                        </div>
+                                    </div>
+                                </div>';
+                        }
+                        
+                        if($receipt['couponCode'] != null) {
+                            echo '
+                                <span>Discount code used: '.$couponCode.'</span>
+                            ';
+                        }
+
+                        echo '
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>';
+                    } 
+			}else if(isset($_SESSION['cart']) && !empty($_SESSION['cart'])) { ?>
+                <div class='card-body'>
 					<div class='table-responsive'>
 						<table class='table table-bordered m-0'>
 							<thead>
@@ -139,6 +255,11 @@
 						);
 					}
 					}
+                    if(isset($_SESSION['discount'])) {
+                        $total = $total - $_SESSION['discount'];
+                        unset($_SESSION['discount']);
+                        unset($_SESSION['discountCode']);
+                    }
 					echo(
 						"</tbody>
 						</table>
@@ -152,112 +273,7 @@
 			</div>
 			<?php 
 				unset($_SESSION['cart']);
-				unset($_SESSION['receiptID']); 
-			}else if(isset($_GET['receiptID'])) {
-				
-				$receiptsResult = mysqli_query($conn, 'SELECT receiptId, saleDate, username FROM receipts WHERE receiptId = \''.$_GET['receiptID'].'\' ORDER BY saleDate DESC');
-                if(mysqli_num_rows($receiptsResult) == 0) {
-                    echo '
-                        <div class="alert alert-secondary" role="alert">
-					        <span>No order history found!</span>
-				        </div>
-                    ';
-                }
-                while($receipt = mysqli_fetch_array($receiptsResult)) {
-                    
-                    if($receipt['username'] != $_SESSION['username']) {
-                        $_SESSION['loginmessage'] = True;
-                        header("location: login.php");
-                    }
-
-                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$receipt['receiptId'].'\'');
-                    
-                    while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
-                        $receiptTotal = $receiptTotal + ($receiptDetails['quantity'] * $receiptDetails['salePrice']);
-                    }
-
-                    echo '
-                        <div class="row">
-                            <div class="col">
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <div class="row row-cols-auto">
-                                            <div class="col border-end">
-                                                <div class="row">
-                                                    <span><small class="text-muted">Order Placed</small></span>
-                                                </div>
-                                                <div class="row">
-                                                    <span>'.date_format(date_create($receipt['saleDate']), "n/d/y h:i A").'</span>
-                                                </div>
-                                            </div>
-                                            <div class="col me-auto">
-                                                <div class="row">
-                                                    <span><small class="text-muted">Total</small></span>
-                                                </div>
-                                                <div class="row">
-                                                    <span>$'.$receiptTotal.'</span>
-                                                </div>
-                                            </div>
-                                            <div class="col ms-auto">
-                                                <div class="row">
-                                                    <span class="text-end"><small class="text-muted">Receipt ID</small></span>
-                                                </div>
-                                                <div class="row">
-                                                    <span class="text-end">'.$receipt['receiptId'].'</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="container">';
-
-                    $receiptTotal = 0;
-
-                    $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$receipt['receiptId'].'\'');
-                    
-                    while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
-                        $productDetails = mysqli_query($conn, 'SELECT product_name, price FROM inventory WHERE sku = \''.$receiptDetails['sku'].'\'');
-                        
-                        if(mysqli_num_rows($productDetails) == 0) {
-                            echo '
-                                <div class="row row-cols-auto g-0 border-bottom">
-                                    <div class="col p-3">
-                                        <img class="img-fluid" style="width:100px;">
-                                    </div>
-                                    <div class="col me-auto">
-                                        <div class="card-body">
-                                            <h5 class="card-title">This Item No Longer Exists</h5>
-                                            <p class="card-text"><small class="text-muted">Price Not Available</small></p>
-                                        </div>
-                                    </div>
-                                </div>';
-
-                            continue;
-                        }
-                        
-                        $productDetails = mysqli_fetch_array($productDetails);
-                        
-                        echo '
-                            <div class="row row-cols-auto g-0 border-bottom">
-                                <div class="col p-3">
-                                    <img class="img-fluid" style="width:100px;">
-                                </div>
-                                <div class="col me-auto">
-                                    <div class="card-body">
-                                        <h5 class="card-title">'.$productDetails['product_name'].'</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">Quantity: '.$receiptDetails['quantity'].'</h6>
-                                        <p class="card-text"><small class="text-muted">'.$productDetails['price'].'</small></p>
-                                    </div>
-                                </div>
-                            </div>';
-                    }
-                    
-                    echo '
-                                    </div>
-                                </div>
-                            </div>
-                        </div>';
-                }
-
+				unset($_SESSION['receiptID']);
 			} 
 			else { ?>
 				<div class="alert alert-secondary" role="alert">
