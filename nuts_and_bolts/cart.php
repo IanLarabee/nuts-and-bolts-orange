@@ -35,9 +35,10 @@
     }
 
 	if(isset($_POST['discount'])) {
-		$discountCode = mysqli_real_escape_string($conn, $_POST['discount']);
+		$discountCode = mysqli_real_escape_string($conn, $_POST['discount'][0]);
 		$discountCode = stripslashes($discountCode);
-		$discountResult = mysqli_query($conn, "SELECT code, dollars_off FROM discounts WHERE code = '$discountCode' AND start_date < NOW() AND end_date > NOW()");
+		$cartTotal = $_POST['discount'][1];
+		$discountResult = mysqli_query($conn, "SELECT code, dollars_off FROM discounts WHERE code = '$discountCode' AND start_date < NOW() AND end_date > NOW() AND '$cartTotal' >= purchase_amount");
 		
 		if(mysqli_num_rows($discountResult) == 0) {
 			echo "fail";
@@ -61,10 +62,13 @@
 		<script>
 			$(document).ready(function(){
 				$("#discount-button").on('click', function(){
+					discount = [];
+					discount[0] = $("#discount-code").val();
+					discount[1] = $("#total").text().slice(1);
 					$.ajax({
 						type: 'post',
 						url: 'cart.php',
-						data: {discount: $("#discount-code").val()},
+						data: {discount: discount},
 						success: function(response){
 							if($.trim(response) == "fail") {
 								$("#discount-error").html("This discount code is invalid");
@@ -245,7 +249,7 @@
 								<h4><strong>Total price:</strong></h4>
 							</div>
 							<div>
-								<h4>$".$total - $discount."</h4>
+								<h4 id='total'>$".$total - $discount."</h4>
 							</div>			
 						</div>
 						");
