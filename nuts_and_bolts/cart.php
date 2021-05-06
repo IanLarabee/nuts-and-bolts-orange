@@ -233,7 +233,6 @@
 							</form>"
 					);
 				  }
-				}
 				echo(
 					"				</tbody>
 								</table>
@@ -253,6 +252,7 @@
 							</div>			
 						</div>
 						");
+				}
 				if(isset($_SESSION['discount'])) {
 					echo ("<div class='py-2 d-flex'>
 							<div class='ms-auto'>
