@@ -218,7 +218,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="startDate" class="form-label">Start Date:</label>
-                        <input class="form-control" type="date" name="startDate" id="startDate">
+                        <input class="form-control" type="date" name="startDate" id="startDate" value="<?php echo date('Y-m-d'); ?>">
                         <span class="text-danger">
                             <?php echo $errors['startDate']; ?>
                         </span>
