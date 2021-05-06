@@ -34,22 +34,7 @@
 		header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
     }
 
-	if(isset($_POST['discount'])) {
-		$discountCode = mysqli_real_escape_string($conn, $_POST['discount'][0]);
-		$discountCode = stripslashes($discountCode);
-		$cartTotal = $_POST['discount'][1];
-		$discountResult = mysqli_query($conn, "SELECT code, dollars_off FROM discounts WHERE code = '$discountCode' AND start_date < NOW() AND end_date > NOW() AND '$cartTotal' >= purchase_amount");
-		
-		if(mysqli_num_rows($discountResult) == 0) {
-			echo "fail";
-			exit;
-		}
 
-		$discountRow = mysqli_fetch_array($discountResult);
-		$_SESSION['discountRow'] = $discountRow;
-		echo json_encode($discountRow);
-		exit;
-	}
 
 	if(isset($_POST['apply'])) {
 		$_SESSION['discountCode'] = $_SESSION['discountRow']['code'];
