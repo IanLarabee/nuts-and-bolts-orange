@@ -47,3 +47,12 @@ CREATE TABLE if not exists`loginlogs`(
 `IpAddress` varbinary(16),
 `user_id` int unsigned not null
 ) engine=InnoDB default charset=latin1;
+
+CREATE TABLE if not exists `discounts`(
+`id` int unsigned auto_increment not null primary key,
+`code` varchar(15) not null,
+`dollars_off` decimal(5, 2) not null,
+`purchase_amount` int not null,
+`start_date` date,
+`end_date` date
+) engine=InnoDB;
