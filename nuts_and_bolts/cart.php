@@ -59,7 +59,30 @@
 	}
 ?>
 <?php require_once "include/header.php"; ?>
-		
+		<script>
+			$(document).ready(function(){
+				$("#discount-button").on('click', function(){
+					var discount = [];
+					discount[0] = $("#discount-code").val();
+					discount[1] = $("#total").text().slice(1);
+					$.ajax({
+						type: 'post',
+						url: 'cart.php',
+						data: {discount: discount},
+						success: function(response){
+							if($.trim(response) == "fail") {
+								$("#discount-error").html("This discount code is invalid");
+							} else {
+								var row = jQuery.parseJSON(response);
+								$("#discount-error").html("");
+								$(".modal-body").html("Would you like to use the discount code '" + row.code + "' for $" + row.dollars_off + " off?")
+								$("#staticBackdrop").modal('show');
+							}
+						}
+					});
+				});
+			});
+		</script>
 		<title>Your Cart</title>
 
         </head>
