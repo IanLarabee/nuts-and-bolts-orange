@@ -8,13 +8,6 @@
         $userLoggedIn = false;
         $employeeLoggedIn = false;
     }
-?>
-<?php
-    require_once "config/connect.php";
-
-    $name = '';
-
-    $errors = array('name'=>'');
 
     if (isset($_SESSION['isEmployee']) && $_SESSION['isEmployee'] == true) {
         ;
@@ -22,29 +15,92 @@
         $_SESSION['loginmessage'] = True;
         header("location: login.php");
     }
+?>
+<?php
+    require_once "config/connect.php";
 
+    $code = '';
+    $dollarsOff = '';
+    $purchaseAmount = '';
+    $startDate = '';
+    $endDate = '';
+
+    $errors = array('code' => '', 'dollarsOff' => '', 'purchaseAmount'=> '', 'startDate'=> '', 'endDate'=> '');
     if(isset($_POST['submit'])){
 
-        if(empty($_POST['name'])) {
-            $errors['name'] = 'A category name is required';
+        if(empty($_POST['code'])) {
+            $errors['code'] = 'A discount code is required';
         } else {
-            $name = $_POST['name'];
-            if(!preg_match('/^[\s\S]{1,255}$/', $name)){
-                $errors['name'] = 'That category name is too long';
+            $code = $_POST['code'];
+            if(!preg_match('/^[\s\S]{5,15}$/', $code)){
+                $errors['code'] = 'Discount codes must be between 5-15 characters long';
             }
         }
 
+        if(empty($_POST['dollarsOff'])) {
+            $errors['dollarsOff'] = 'A discount amount is required';
+        } else {
+            $dollarsOff = $_POST['dollarsOff'];
+            if($dollarsOff < 1){
+                $errors['dollarsOff'] = 'Discount must be one or more dollars';
+            }
+        }
+
+        if(empty($_POST['purchaseAmount'])) {
+            $errors['purchaseAmount'] = 'A total purchase amount is required';
+        } else {
+            $purchaseAmount = $_POST['purchaseAmount'];
+            if($purchaseAmount < 2 )
+            {
+                $errors['purchaseAmount'] = 'Total purchase amount must be greater than one dollar';
+            }
+            else if($purchaseAmount < $dollarsOff)
+            {
+                $errors['purchaseAmount'] = 'Purchase amount must be more than dollars off';
+            }
+        }
+
+        if(empty($_POST['startDate'])) {
+            $errors['startDate'] = "The discount's starting date is required";
+        } else {
+            $startDate = $_POST['startDate'];
+            $today = date("Y-m-d");
+            if(strtotime($startDate) < strtotime($today)){
+                $errors['startDate'] = 'Start date must be the current date or later';
+            }
+        }
+
+        if(empty($_POST['endDate'])) {
+            $errors['endDate'] = "The discount's ending date is required";
+        } else {
+            $endDate = $_POST['endDate'];
+            if(strtotime($endDate) < strtotime($startDate)){
+                $errors['endDate'] = 'End date must be after start date';
+            }
+        }
+
+
         if(!array_filter($errors))
         {
-            $stmt = $conn->prepare("INSERT INTO categories(name) VALUES(?)");
-            $stmt->bind_param("s", $name);
+            $stmt = $conn->prepare("INSERT INTO discounts(code, dollars_off, purchase_amount, start_date, end_date) VALUES(?, ?, ?, ?, ?)");
+            $stmt->bind_param("sdiss", $code, $dollarsOff, $purchaseAmount, $startDate, $endDate);
 
-            $name = mysqli_real_escape_string($conn, $_POST['name']);
-            $name = stripslashes($name);
+            $code = mysqli_real_escape_string($conn, $_POST['code']);
+            $dollarsOff = mysqli_real_escape_string($conn, $_POST['dollarsOff']);
+            $purchaseAmount = mysqli_real_escape_string($conn, $_POST['purchaseAmount']);
+            $startDate = mysqli_real_escape_string($conn, $_POST['startDate']);
+            $endDate = mysqli_real_escape_string($conn, $_POST['endDate']);
+
+            $code = stripslashes($code);
+            $dollarsOff = stripslashes($dollarsOff);
+            $purchaseAmount = stripslashes($purchaseAmount);
+            $startDate = stripslashes($startDate);
+            $endDate = stripslashes($endDate);
+
 
             if($stmt->execute()) {
+                $_SESSION['code'] = htmlspecialchars($code);
                 $_SESSION['postStatus'] = true;
-                $_SESSION['name'] = htmlspecialchars($name);
                 header("Location: {$_SERVER['REQUEST_URI']}", true, 303);
                 $stmt->close();
                 $conn->close();
@@ -58,12 +114,12 @@
 ?>
 <?php require_once "include/header.php"; ?>
 
-<title>Add Category | Nuts and Bolts</title>
+<title>Add Discount Code | Nuts and Bolts</title>
 
     </head>
     <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
                 <a class="navbar-brand" href="index.php"><img src="assets/nutsandboltslogo.png" alt="Nuts and Bolts" id="logo"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,10 +127,10 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+                        <a class="nav-link" href="index.php">Home</a>
                         <?php if($employeeLoggedIn): ?>
                             <div class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle active" href="#" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Products
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
@@ -86,8 +142,6 @@
                                     <a class="dropdown-item" href="addCode.php">Add Discount Code</a>
                                 </div>
 						    </div>
-                        <?php else: ?>
-                            <a class="nav-link" href="products.php">Products</a>
                         <?php endif; ?> 
                         <a class="nav-link" href="faq.php">FAQ</a>
                         <a class="nav-link" href="contact.php">Contact Us</a>
@@ -129,38 +183,73 @@
             </div>
         </nav>
 
+
         <div class="container">
             
-            <h1>Add Category</h1>
+            <h1>Add Discount Code</h1>
             <div class="container bg-light text-dark">
-                <form class="row g-3" action="addCategory.php" method="POST">
+                <form class="row g-3" action="addCode.php" method="POST">
                     <div class="form-group col-12">
-                        <label for="categoryName" class="form-label">Category Name:</label>
-                        <input type ="text" class="form-control" id="categoryName" name ="name" value = "<?php echo htmlspecialchars($name); ?>">
+                        <label for="code" class="form-label">Discount Code:</label>
+                        <input type ="text" class="form-control" name ="code" id="code" value = "<?php echo htmlspecialchars($code); ?>">
                         <span class="text-danger">
-                            <?php echo $errors['name']; ?>
+                            <?php echo $errors['code']; ?>
                         </span>
                     </div>
-                    <button class="btn btn-primary" type="submit" name="submit">Add Category</button>
+                    <div class="form-group col-md-6">
+                        <label for="dollarsOff" class="form-label">Dollars Off:</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">$ </span>
+                            <input type="number" class="form-control" name="dollarsOff" id="dollarsOff">
+                        </div>
+                        <span class="text-danger">
+                            <?php echo $errors['dollarsOff']; ?>
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="purchaseAmount" class="form-label">Purchase Amount:</label>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">$ </span>
+                            <input type="number" class="form-control" name="purchaseAmount" id="purchaseAmount">
+                        </div>
+                        <span class="text-danger">
+                            <?php echo $errors['purchaseAmount']; ?>
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="startDate" class="form-label">Start Date:</label>
+                        <input class="form-control" type="date" name="startDate" id="startDate">
+                        <span class="text-danger">
+                            <?php echo $errors['startDate']; ?>
+                        </span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="endDate" class="form-label">End Date:</label>
+                        <input class="form-control" type="date" name="endDate" id="endDate">
+                        <span class="text-danger">
+                            <?php echo $errors['endDate']; ?>
+                        </span>
+                    </div>
+                    <button class="btn btn-primary" type="submit" name="submit">Add Code</button>
 
                     <?php                
                         if(isset($_SESSION['postStatus']) && $_SESSION['postStatus']) {
                     ?>
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <?php echo $_SESSION['name']; ?> was added successfully to categories!
+                            <?php echo $_SESSION['code']; ?> was added successfully to discounts!
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <?php
                         } elseif(isset($_SESSION['postStatus']) && !$_SESSION['postStatus']) {
                     ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <?php if($name =='') { echo 'This category';}else{ echo htmlspecialchars($name);} ?> could not be added due to an error.
+                            <?php if($code =='') { echo 'This discount code';}else{ echo htmlspecialchars($code);} ?> could not be added due to an error.
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     <?php
                         }
                         unset($_SESSION['postStatus']);
-                        unset($_SESSION['name']);
+                        unset($_SESSION['code']);
                     ?>
 
                 </form>

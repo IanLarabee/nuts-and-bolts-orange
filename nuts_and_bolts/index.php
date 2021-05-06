@@ -18,7 +18,7 @@
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
-                <a class="navbar-brand" href="index.php">Nuts and Bolts</a>
+                <a class="navbar-brand" href="index.php"><img src="assets/nutsandboltslogo.png" alt="Nuts and Bolts" id="logo"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -36,6 +36,7 @@
                                     <a class="dropdown-item" href="update.php">Update Products</a>
                                     <a class="dropdown-item" href="addCategory.php">Add Categories</a>
                                     <a class="dropdown-item" href="salesreport.php">Product Sales</a>
+                                    <a class="dropdown-item" href="addCode.php">Add Discount Code</a>
                                 </div>
 						    </div>
                         <?php else: ?>
