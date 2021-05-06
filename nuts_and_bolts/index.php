@@ -113,7 +113,8 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);?>
                                         <h5 class="card-title">' . $row['product_name'] . '</h5>
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-text">$' . $row['price'] . '</p>
+                                        <h4 class="card-text" style="color:red">Only $' . $row['price'] . '!</h4>
+                                        <a href="products.php" class="stretched-link"></a>
                                     </div>
                                 </div>
                             </div>
