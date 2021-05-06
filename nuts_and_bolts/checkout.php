@@ -14,9 +14,19 @@
 
     if(isset($_SESSION['username'])) {
         $username = $_SESSION['username'];
-        mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate) VALUES ('$receiptid', '$username', NOW())");
+        if(isset($_SESSION['discountCode'])) {
+            $couponCode = $_SESSION['discountCode'];
+            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', '$username', NOW(), $couponCode)");
+        } else {
+            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', '$username', NOW())");
+        }
     } else {
-        mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate) VALUES ('$receiptid', 'guest', NOW())");
+        if(isset($_SESSION['discountCode'])) {
+            $couponCode = $_SESSION['discountCode'];
+            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate, couponCode) VALUES ('$receiptid', 'guest', NOW(), $couponCode)");
+        } else {
+            mysqli_query($conn,"INSERT INTO receipts(receiptID, username, saleDate) VALUES ('$receiptid', 'guest', NOW())");
+        }
     }
 
     foreach($_SESSION['cart'] as $sku => $qty)
