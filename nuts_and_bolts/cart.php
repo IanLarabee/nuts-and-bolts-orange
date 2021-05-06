@@ -249,7 +249,13 @@
 								<h4><strong>Total price:</strong></h4>
 							</div>
 							<div>
-								<h4 id='total'>$".$total."</h4>
+								<h4 id='total'>$");
+				if(isset($_SESSION['discount'])) {
+					echo $total - $discount;
+				} else {
+					echo $total;
+				}
+				echo("	</h4>
 							</div>			
 						</div>
 						");
