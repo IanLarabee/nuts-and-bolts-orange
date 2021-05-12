@@ -111,7 +111,7 @@
                     echo '
                             <div class="carousel-item active">
                             '.(mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<input type="image" src="data:image/jpg;charset=utf8;base64,'.base64_encode($imgRow['imagedata']).'" class="d-block w-100" style="height: 600px; width: 700px; object-fit: scale-down;" name="category[great_deal]" value="true">').'
-                                <div class="carousel-caption d-none d-md-block shadow p-3 mb-5 bg-body rounded">
+                                <div class="carousel-caption d-none d-md-block shadow p-3 mb-5 bg-body rounded position-absolute bottom-0 start-50 translate-middle-x">
                                     <h4>Get this '.$row['product_name'].' for only </h5>
                                     <h3 class="text-success">$'.$row['price'].'</h3>
                                     <h5>along with other great deals!</h5>
@@ -128,7 +128,7 @@
                     echo '
                             <div class="carousel-item">
                             '.(mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<input type="image" src="data:image/jpg;charset=utf8;base64,'.base64_encode($imgRow['imagedata']).'" class="d-block w-100" style="height: 600px; width: 700px; object-fit: scale-down;" name="category[great_deal]" value="true">').'
-                                <div class="carousel-caption d-none d-md-block shadow p-3 mb-5 bg-body rounded">
+                                <div class="carousel-caption d-none d-md-block shadow p-3 mb-5 bg-body rounded position-absolute bottom-0 start-50 translate-middle-x">
                                     <h3>'.$row['product_name'].'</h3>
                                     <h4>Only</h4>
                                     <h3 class="text-success">$'.$row['price'].'</h3>

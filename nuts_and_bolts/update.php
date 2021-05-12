@@ -249,7 +249,11 @@
                             $("#productQuantity").val(row.quantity);
                             $("#productCategory").val(row.category_id);
                             $("#productDescription").text(row.description);
-                            $("#productgreat_deal").val(row.great_deal);
+                            if(row.great_deal == 1) {
+                                $( "#great_deal" ).prop( "checked", true );
+                            } else {
+                                $( "#great_deal" ).prop( "checked", false );
+                            }
                         }
                     });
                 });
@@ -457,9 +461,6 @@
                                             </ul>
                                             <div class="card-body">
                                             <p class="card-text">Quantity: ' . $rows[$item]['quantity'] . '</p>
-                                            </div>
-                                            <div class="card-body">
-                                            <p class="card-text">Category: ' . $rows[$item]['category_id'] . '</p>
                                             </div>
                                             <div class="card-body">
                                                 <p class="card-text">$' . $rows[$item]['price'] . '</p>
