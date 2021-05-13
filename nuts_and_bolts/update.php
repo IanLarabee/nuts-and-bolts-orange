@@ -61,7 +61,7 @@
     $quantity = '';
     $category = '';
     $selectSKU = '';
-    $great_deal = '';
+    $great_deal = 0;
     $result = mysqli_query($conn, "SELECT * FROM inventory LIMIT 0,0");
     $rows = array();
 
@@ -108,7 +108,7 @@
                 $price = $rows[0]['price'];
                 $quantity = $rows[0]['quantity'];
                 $category = $rows[0]['category_id'];
-                $great_deal =$rows[0]['great_deal'];
+                $great_deal = $rows[0]['great_deal'];
             }
         }
     }
@@ -158,7 +158,7 @@
         if(empty($_POST['quantity'])) {
             $errors['quantity'] = 'A product quantity is required';
         } else {
-            $price = $_POST['quantity'];
+            $quantity = $_POST['quantity'];
             if(!is_numeric($price)){
                 $errors['quantity'] = 'The product quantity must be a numeric value';
             }
@@ -168,6 +168,10 @@
             $errors['category'] = 'A product category is required';
         } else {
             $category = $_POST['category'];
+        }
+
+        if(!empty($_POST['great_deal'])) {
+            $great_deal = $_POST['great_deal'];
         }
 
         if(is_uploaded_file($_FILES['productImage']['tmp_name'])){
@@ -183,12 +187,6 @@
             if (!in_array($ext, $allowed)) {
                 $errors['image'] = "Image file must be a .jpg, .png, or .gif";
             }
-        }
-      
-        if(isset($_POST['great_deal'])) {
-            $great_deal = 1;
-        } else {
-            $great_deal = 0;
         }
 
         if(!array_filter($errors)) {
@@ -251,7 +249,11 @@
                             $("#productQuantity").val(row.quantity);
                             $("#productCategory").val(row.category_id);
                             $("#productDescription").text(row.description);
-                            $("#productgreat_deal").val(row.great_deal);
+                            if(row.great_deal == 1) {
+                                $( "#great_deal" ).prop( "checked", true );
+                            } else {
+                                $( "#great_deal" ).prop( "checked", false );
+                            }
                         }
                     });
                 });
@@ -384,6 +386,10 @@
                                 <span class="input-group-text">$ </span>
                                 <input type="text" class="form-control" id="productPrice" name="price" value="<?php echo htmlspecialchars($price); ?>">
                             </div>
+                            <div class="form-check form-switch">
+                                    <label class="form-check-label" for="great_deal">Great Deal</label>
+                                    <input type="checkbox" class="form-check-input" name="great_deal" id="great_deal" value="1"<?php if($great_deal === '1') {echo ' checked';}?>>
+                                </div>
                             <span class="text-danger">
                                 <?php echo $errors['price']; ?>
                             </span>
@@ -409,11 +415,17 @@
 
                         <div class="form-group col-md-6">
                             <label for="productCategory" class="form-label">Category:</label>
-                            <select name="category" id="productCategory" class="form-control" value="<?php echo htmlspecialchars($category); ?>">
+                            <select name="category" id="productCategory" class="form-control">
                                 <?php $result = mysqli_query($conn, "SELECT * FROM categories");
 
                                     while($row = mysqli_fetch_array($result)){
-                                        echo '<option value="' . $row['id'] . '">' . $row['name'] . '</option>';
+                                        echo '<option value="'.$row['id'].'" ';
+
+                                        if($row['id'] == $category) {
+                                            echo  'selected';
+                                        }
+
+                                        echo '>'.$row['name'].'</option>';
                                     }
                                 ?>  
                             </select>
@@ -429,14 +441,6 @@
                             <span class="text-danger">
                                 <?php echo $errors['image']; ?>
                             </span>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="form-check">
-                                <label class="form-check-label" for="great_deal">Great Deal</label>
-                                  <input type="checkbox" class="form-check-input" name="great_deal" id="great_deal" value="1"
-                                  <?php if($great_deal === '1') echo 'checked="checked"';?> />
-                            </div>
                         </div>
                         
                         <?php                
@@ -457,9 +461,6 @@
                                             </ul>
                                             <div class="card-body">
                                             <p class="card-text">Quantity: ' . $rows[$item]['quantity'] . '</p>
-                                            </div>
-                                            <div class="card-body">
-                                            <p class="card-text">Category: ' . $rows[$item]['category_id'] . '</p>
                                             </div>
                                             <div class="card-body">
                                                 <p class="card-text">$' . $rows[$item]['price'] . '</p>

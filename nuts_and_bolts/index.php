@@ -85,16 +85,39 @@
         
         <div class="container">
             <h1>Great Deals!</h1>
-
-
-            <div class = "row row-cols-1 row-cols-md-4 g-3">
-
-            <?php $result = mysqli_query($conn, "SELECT product_id, product_name, price FROM inventory WHERE great_deal = 1"); ?>
+            <?php 
+                $result = mysqli_query($conn, "SELECT product_id, product_name, price, description FROM inventory WHERE great_deal = 1");
                 
+                echo '  <div id="carouselExampleDark" class="carousel carousel-dark slide border border-2" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>';
 
-                <?php 
+                for($i = 1; $i < mysqli_num_rows($result); $i++){
+                    echo'
+                        <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="'.$i.'" aria-label="Slide '.($i + 1).'"></button>';
+                }
+                
+                echo '
+                    </div>
+                    <form action="products.php" method="POST">
+                        <div class="carousel-inner">';
+                $row = mysqli_fetch_array($result);
 
-                $currentCategory = 0;
+                $prodId = $row['product_id'];
+                    $imgSql = "SELECT * FROM images WHERE product_id = $prodId";
+                    $imgResult = mysqli_query($conn, $imgSql);
+                    $imgRow = $imgResult->fetch_assoc();
+
+                    echo '
+                            <div class="carousel-item active">
+                            '.(mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<input type="image" src="data:image/jpg;charset=utf8;base64,'.base64_encode($imgRow['imagedata']).'" class="d-block w-100" style="height: 600px; width: 700px; object-fit: scale-down;" name="category[great_deal]" value="true">').'
+                                <div class="carousel-caption d-none d-md-block shadow p-3 mb-5 bg-body rounded position-absolute bottom-0 start-50 translate-middle-x">
+                                    <h4>Get this '.$row['product_name'].' for only </h5>
+                                    <h3 class="text-success">$'.$row['price'].'</h3>
+                                    <h5>along with other great deals!</h5>
+                                </div>
+                            </div>';
+
                 while($row = mysqli_fetch_array($result))
                 {
                     $prodId = $row['product_id'];
@@ -102,29 +125,32 @@
                     $imgResult = mysqli_query($conn, $imgSql);
                     $imgRow = $imgResult->fetch_assoc();
 
-                    echo '<div class = "col">
-                        <form class="product-card">
-                            <div class="card h-100">
-                                    <div class="card-body">
-                                        ' . (mysqli_num_rows($imgResult) == 0 ? '<h4>Image Unavailable</h4>' : '<img src="data:image/jpg;charset=utf8;base64,'. base64_encode($imgRow['imagedata']). '"  class="product-img">') . '
-                                    </div>
-                                    <div class="card-body">
-                                        <h5 class="card-title">' . $row['product_name'] . '</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <h4 class="card-text" style="color:red">Only $' . $row['price'] . '!</h4>
-                                        <a href="products.php" class="stretched-link"></a>
-                                    </div>
+                    echo '
+                            <div class="carousel-item">
+                            '.(mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<input type="image" src="data:image/jpg;charset=utf8;base64,'.base64_encode($imgRow['imagedata']).'" class="d-block w-100" style="height: 600px; width: 700px; object-fit: scale-down;" name="category[great_deal]" value="true">').'
+                                <div class="carousel-caption d-none d-md-block shadow p-3 mb-5 bg-body rounded position-absolute bottom-0 start-50 translate-middle-x">
+                                    <h3>'.$row['product_name'].'</h3>
+                                    <h4>Only</h4>
+                                    <h3 class="text-success">$'.$row['price'].'</h3>
                                 </div>
-                            </div>
-                        </form>'
-                    ;
+                            </div>';
 
                 }
 
-                echo '</div>';
+                echo '
+                    </form>
+                    </div>  
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>';
                 mysqli_close($conn);
-                ?>
-        </div>       
-
+                
+            ?>
+        </div>  
 <?php require_once "include/footer.php"; ?>

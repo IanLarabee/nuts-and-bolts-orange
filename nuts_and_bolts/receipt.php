@@ -118,6 +118,10 @@
                             $receiptTotal = $receiptTotal - $coupon['dollars_off'];
                         }
 
+                        $timezone = new DateTimeZone('UTC');
+                        $date = new DateTime($receipt['saleDate'], $timezone);
+                        $date->setTimezone(new DateTimeZone('America/New_York'));
+
                         echo '
                             <div class="row">
                                 <div class="col">
@@ -129,7 +133,7 @@
                                                         <span><small class="text-muted">Order Placed</small></span>
                                                     </div>
                                                     <div class="row">
-                                                        <span>'.date_format(date_create($receipt['saleDate']), "n/d/y h:i A").'</span>
+                                                        <span>'.$date->format("n/d/y h:i A").'</span>
                                                     </div>
                                                 </div>
                                                 <div class="col me-auto">
@@ -157,7 +161,7 @@
                         $receiptDetailsResult = mysqli_query($conn, 'SELECT sku, quantity, salePrice FROM receipt_details WHERE receiptId = \''.$receipt['receiptId'].'\'');
                         
                         while($receiptDetails = mysqli_fetch_array($receiptDetailsResult)) {
-                            $productDetails = mysqli_query($conn, 'SELECT product_name, price FROM inventory WHERE sku = \''.$receiptDetails['sku'].'\'');
+                            $productDetails = mysqli_query($conn, 'SELECT product_id, product_name, price FROM inventory WHERE sku = \''.$receiptDetails['sku'].'\'');
                             
                             if(mysqli_num_rows($productDetails) == 0) {
                                 echo '
@@ -177,11 +181,16 @@
                             }
                             
                             $productDetails = mysqli_fetch_array($productDetails);
+
+                            $prodId = $productDetails['product_id'];
+                            $imgSql = "SELECT * FROM images WHERE product_id = $prodId";
+                            $imgResult = mysqli_query($conn, $imgSql);
+                            $imgRow = $imgResult->fetch_assoc();
                             
                             echo '
                                 <div class="row row-cols-auto g-0 border-bottom">
                                     <div class="col p-3">
-                                        <img class="img-fluid" style="width:100px;">
+                                        '.(mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<img src="data:image/jpg;charset=utf8;base64,'.base64_encode($imgRow['imagedata']).'" style="width: 100px; object-fit: scale-down;">').'
                                     </div>
                                     <div class="col me-auto">
                                         <div class="card-body">

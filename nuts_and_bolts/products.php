@@ -20,15 +20,93 @@
 <?php require_once "include/header.php"; ?>
 <?php require_once "config/connect.php" ?>
     <script>
+        var toastIDCounter = 0;
+
+        (function ($) {
+            $.fn.bsToast = function (options) {
+                if (typeof options === "string") {
+                    options = {
+                        body: options
+                    }
+                }
+                var settings = $.extend({
+                    // These are the defaults.
+                    body: "MISSING body: <br/>$(...).bsToast({body: 'toast body text here'})<br/><strong><em>html is OK!</em></strong>",
+                    animation: true, // Apply a CSS fade transition to the toast
+                    autohide: true,	 // Auto hide the toast
+                    delay: 3000,	 // Delay hiding the toast (ms)
+                    dispose: true
+                }, options);
+
+                var $toastContainer = $("#toast-container");
+
+                if ($toastContainer.length === 0) {
+                    // re-create toastPosition and toastContainer
+                    var $toastPosition = $("<div>", {
+                        "id": "toast-position",
+                        "aria-live": "polite",
+                        "aria-atomic": "true",
+                        "style": "position: fixed; min-height: 200px;top: 5px;right: 5px;"
+                    });
+
+                    $toastContainer = $("<div>", {
+                        "id": "toast-container",
+                        "style": "position: absolute; top: 5px; right: 5px;"
+                    });
+
+                    $(document.body).append($toastPosition);
+                    $toastPosition.append($toastContainer)
+                }
+
+                var toastid = "toast-id-" + toastIDCounter;
+                toastIDCounter++
+
+                var $toast = $("<div>", {
+                    "id": toastid,
+                    "class": "toast",
+                    "style": "min-width: 300px;",
+                    "role": "alert",
+                    "aria-live": "assertive",
+                    "aria-atomic": true
+                });
+
+                if (settings.header && settings.header.text) {
+                    var $header = $("<div>", {"class": "toast-header"});
+                    if (settings.header.logo) {
+                        $header.append(`<img src="${settings.header.logo}" class="rounded mr-2" height="25" width="25" alt="logo">`)
+                    }
+                    $header.append(`<strong class="mr-auto">${settings.header.text}</strong>`)
+                    // $header.append(`<small class="text-muted">just now</small>`)
+                    $header.append(`<button type="button" class="ms-auto btn-close" data-bs-dismiss="toast" aria-label="Close"></button>`)
+                    $toast.append($header)
+                }
+
+                var $toastBody = $("<div>", {"class": "toast-body"});
+                $toastBody.html(settings.body)
+                $toast.append($toastBody)
+                $toastContainer.append($toast)
+
+                var toastEl = $toast[0]
+                toastEl.addEventListener('hidden.bs.toast', toastEl.remove)
+                var t = new bootstrap.Toast(toastEl, {delay: settings.delay});
+                t.show()
+            };
+
+        }(jQuery));
+
         $(document).ready(function(){
             $('.product-card').on('submit', function(){
                 $.ajax({
                     type: 'post',
                     context: this,
-                    data: {add: $(this).find("p[class='card-text product-sku']").text().slice(5)},
+                    data: {add: $(this).find("p[class='card-text product-sku mb-0']").text().slice(5)},
                     success: function(){
-                        $("div[class='alert alert-success alert-dismissible fade show']").show();
-                        $('#alert-message').text($(this).find('.card-title').text() + " was added to your cart.");
+                        $(document).bsToast({
+                        header: {
+                            text: "Cart"
+                        },
+                        body: '<div class="row"><div class="col-5"><img src="' + $(this).find('.card-img-top').attr('src') + '" class="d-inline" style="height: 100px; width: 100px; object-fit: scale-down;"></div><div class="col-7"><h5>' + $(this).find('.card-title').text() + '</h5><p> was added to your cart</p></div></div>'
+                        })
                     }
                 });
                 return false;
@@ -107,58 +185,95 @@
 
         <div class = "container">
             <h1>Products</h1>
-            
-            <div class = "row row-cols-1 row-cols-md-4 g-3">
-
-            <?php $result = mysqli_query($conn, "SELECT inventory.product_id, inventory.product_name, inventory.sku, inventory.description, inventory.price, inventory.quantity, categories.name as catname, categories.id as catid FROM inventory LEFT JOIN categories ON (inventory.category_id=categories.id) ORDER BY categories.name ASC"); ?>
-            
 
             <?php 
+            
+            $result = mysqli_query($conn, "SELECT name FROM categories");
+            
+            echo '<div class="row">
+                <div class="col bg-light">
+                <h3>Filter</h3>
+                <h5 class="border-bottom border-2">Categories</h5>
+                    <form action="products.php" method="POST">';
 
-            $currentCategory = 0;
-            while($row = mysqli_fetch_array($result))
-            {
-                $prodId = $row['product_id'];
-                $imgSql = "SELECT * FROM images WHERE product_id = $prodId";
-                $imgResult = mysqli_query($conn, $imgSql);
-                $imgRow = $imgResult->fetch_assoc();
-
-                if($currentCategory != $row['catid'])
-                {
-                    echo '</div><div class="row">
-                    <h3 style="padding: 0.5em 0.5em 0.5em 0.5em">' . $row['catname'] . '</h3>';
-                    $currentCategory = $row['catid'];
+            while($row = mysqli_fetch_array($result)) {
+                echo '<input class="form-check-input" type="checkbox" id="'.$row['name'].'" name="category[]" value="'.$row['name'].'"';
+                
+                if(isset($_POST['category']) && in_array($row['name'], $_POST['category'])) {
+                    echo 'checked';
                 }
-                echo '<div class = "col">
-                    <form class="product-card">
-                        <div class="card h-100">
-                                <div class="card-body">
-                                    ' . (mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<img src="data:image/jpg;charset=utf8;base64,'. base64_encode($imgRow['imagedata']). '"  class="product-img">') . '
-                                </div>
-                                <div class="card-body">
-                                    <h5 class="card-title">' . $row['product_name'] . '</h5>
-                                    <p class="card-text product-sku"><small class = "text-muted">SKU: ' . $row['sku'] . '</small></p>
-                                </div>
-                                <ul class="h-100 list-group list-group-flush">
-                                    <li class="list-group-item">' . $row['description'] . '</li>
-                                </ul>
-                                <div class="card-body">
-                                    <p class="card-text">$' . $row['price'] . '</p>
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text">' . $row['quantity']. ' in stock</p>
-                                </div>
-                                <div class="card-body row">
-                                    ' .($row['quantity'] > 0 ? '<button class="btn btn-primary select" type="submit">Add to Cart</button>' : '<p class="text-danger">Out of stock</p>'). '
-                                </div>
-                            </div>
-                        </div>
-                    </form>'
-                ;
 
+                echo '><label class="form-check-label" for="'.$row['name'].'"> '.$row['name'].'</label><br>';
+            }
+            
+            echo'<br>
+                <h5 class="border-bottom border-2">Price</h5>
+                <input class="form-check-input" type="checkbox" id="great-deal" name="category[great_deal]" value="true"';
+            
+            if(isset($_POST['category']) && isset($_POST['category']['great_deal'])) {
+                echo 'checked';
             }
 
-            echo '</div>';
+            echo'><label class="form-check-label" for="great-deal"> Great Deals</label><br><br>
+                <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Submit">
+            </form>
+            </div>
+                <div class="col-10">
+                    <div class="row">';
+
+            if(isset($_POST['submit']) && isset($_POST['category'][0])) {
+                $categories = implode("', '", $_POST['category']);
+                $greatDeal = implode(", ", array(0 , 1));
+                if(isset($_POST['category']['great_deal']) && $_POST['category']['great_deal'] == 'true') {
+                    $greatDeal = 1;
+                }
+                $result = mysqli_query($conn, "SELECT product_id, product_name, sku, description, price, quantity, name as catname, id as catid FROM nutsandbolts.inventory INNER JOIN nutsandbolts.categories ON (category_id=id) AND name IN ('$categories') AND great_deal IN ($greatDeal) ORDER BY catname ASC, quantity DESC");
+            } elseif((isset($_POST['submit']) || isset($_POST['category'])) && isset($_POST['category']['great_deal'])) {
+                $result = mysqli_query($conn, "SELECT product_id, product_name, sku, description, price, quantity, name as catname, id as catid FROM nutsandbolts.inventory INNER JOIN nutsandbolts.categories ON (category_id=id) AND great_deal=1 ORDER BY catname ASC, quantity DESC");
+            } else {
+                $result = mysqli_query($conn, "SELECT inventory.product_id, inventory.product_name, inventory.sku, inventory.description, inventory.price, inventory.quantity, categories.name as catname, categories.id as catid FROM inventory LEFT JOIN categories ON (inventory.category_id=categories.id) ORDER BY categories.name ASC, inventory.quantity DESC");
+            }
+            
+            if(mysqli_num_rows($result) > 0) {
+                while($row = mysqli_fetch_array($result))
+                {
+                    $prodId = $row['product_id'];
+                    $imgSql = "SELECT * FROM images WHERE product_id = $prodId";
+                    $imgResult = mysqli_query($conn, $imgSql);
+                    $imgRow = $imgResult->fetch_assoc();
+
+                    echo '<div class="col-auto">
+                        <form class="product-card">
+                            <div class="card h-100">
+                                ' . (mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<img src="data:image/jpg;charset=utf8;base64,'. base64_encode($imgRow['imagedata']). '"  class="card-img-top" style="width: 235px; object-fit: scale-down;" />') . '
+                                <div class="card-body" style="width: 249px; height:325px;">
+                                    <div class="d-flex flex-column" style="height: 300px;">    
+                                        <h5 class="card-title">' . $row['product_name'] . '</h5>
+                                        <p class="card-text product-sku mb-0"><small class = "text-muted">SKU: ' . $row['sku'] . '</small></p>
+                                        <span class="badge rounded-pill bg-primary">'.$row['catname'].'</span>
+                                        <p class="card-text mt-2">' . $row['description'] . '</p>
+                                        <h2 class="card-text mt-auto">$' . $row['price'] . '</h2>
+                                        <p class="card-text">' . $row['quantity']. ' in stock</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="row">
+                                    ' .($row['quantity'] > 0 ? '<button class="btn btn-primary select" type="submit">Add to Cart</button>' : '<button class="btn btn-secondary" disabled data-bs-toggle="button" autocomplete="off">Unavailable</button>'). '
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>'
+                    ;
+
+                }
+            } else {
+                echo'<div class="alert alert-secondary" role="alert">
+                No products found matching this criteria!
+            </div>';
+            }
+
+            echo '</div></div></div>';
             mysqli_close($conn);
             ?>
                 <br>
@@ -167,5 +282,6 @@
                 </div>
             </div>  
         </div>
-
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
 <?php require_once "include/footer.php"; ?>

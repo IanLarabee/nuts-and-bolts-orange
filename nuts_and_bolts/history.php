@@ -118,6 +118,10 @@
                         $receiptTotal = $receiptTotal - $coupon['dollars_off'];
                     }
 
+                    $timezone = new DateTimeZone('UTC');
+                    $date = new DateTime($receipt['saleDate'], $timezone);
+                    $date->setTimezone(new DateTimeZone('America/New_York'));
+
                     echo '
                         <div class="row">
                             <div class="col">
@@ -129,7 +133,7 @@
                                                     <span><small class="text-muted">Order Placed</small></span>
                                                 </div>
                                                 <div class="row">
-                                                    <span>'.date_format(date_create($receipt['saleDate']), "n/d/y h:i A").'</span>
+                                                    <span>'.$date->format("n/d/y h:i A").'</span>
                                                 </div>
                                             </div>
                                             <div class="col me-auto">
