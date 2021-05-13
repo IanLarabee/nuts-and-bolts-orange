@@ -234,37 +234,43 @@
                 $result = mysqli_query($conn, "SELECT inventory.product_id, inventory.product_name, inventory.sku, inventory.description, inventory.price, inventory.quantity, categories.name as catname, categories.id as catid FROM inventory LEFT JOIN categories ON (inventory.category_id=categories.id) ORDER BY categories.name ASC, inventory.quantity DESC");
             }
             
-            while($row = mysqli_fetch_array($result))
-            {
-                $prodId = $row['product_id'];
-                $imgSql = "SELECT * FROM images WHERE product_id = $prodId";
-                $imgResult = mysqli_query($conn, $imgSql);
-                $imgRow = $imgResult->fetch_assoc();
+            if(mysqli_num_rows($result) > 0) {
+                while($row = mysqli_fetch_array($result))
+                {
+                    $prodId = $row['product_id'];
+                    $imgSql = "SELECT * FROM images WHERE product_id = $prodId";
+                    $imgResult = mysqli_query($conn, $imgSql);
+                    $imgRow = $imgResult->fetch_assoc();
 
-                echo '<div class="col-auto">
-                    <form class="product-card">
-                        <div class="card h-100">
-                            ' . (mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<img src="data:image/jpg;charset=utf8;base64,'. base64_encode($imgRow['imagedata']). '"  class="card-img-top" style="width: 235px; object-fit: scale-down;" />') . '
-                            <div class="card-body" style="width: 249px; height:325px;">
-                                <div class="d-flex flex-column" style="height: 300px;">    
-                                    <h5 class="card-title">' . $row['product_name'] . '</h5>
-                                    <p class="card-text product-sku mb-0"><small class = "text-muted">SKU: ' . $row['sku'] . '</small></p>
-                                    <span class="badge rounded-pill bg-primary">'.$row['catname'].'</span>
-                                    <p class="card-text mt-2">' . $row['description'] . '</p>
-                                    <h2 class="card-text mt-auto">$' . $row['price'] . '</h2>
-                                    <p class="card-text">' . $row['quantity']. ' in stock</p>
+                    echo '<div class="col-auto">
+                        <form class="product-card">
+                            <div class="card h-100">
+                                ' . (mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<img src="data:image/jpg;charset=utf8;base64,'. base64_encode($imgRow['imagedata']). '"  class="card-img-top" style="width: 235px; object-fit: scale-down;" />') . '
+                                <div class="card-body" style="width: 249px; height:325px;">
+                                    <div class="d-flex flex-column" style="height: 300px;">    
+                                        <h5 class="card-title">' . $row['product_name'] . '</h5>
+                                        <p class="card-text product-sku mb-0"><small class = "text-muted">SKU: ' . $row['sku'] . '</small></p>
+                                        <span class="badge rounded-pill bg-primary">'.$row['catname'].'</span>
+                                        <p class="card-text mt-2">' . $row['description'] . '</p>
+                                        <h2 class="card-text mt-auto">$' . $row['price'] . '</h2>
+                                        <p class="card-text">' . $row['quantity']. ' in stock</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="row">
+                                    ' .($row['quantity'] > 0 ? '<button class="btn btn-primary select" type="submit">Add to Cart</button>' : '<button class="btn btn-secondary" disabled data-bs-toggle="button" autocomplete="off">Unavailable</button>'). '
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                <div class="row">
-                                ' .($row['quantity'] > 0 ? '<button class="btn btn-primary select" type="submit">Add to Cart</button>' : '<button class="btn btn-secondary" disabled data-bs-toggle="button" autocomplete="off">Unavailable</button>'). '
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>'
-                ;
+                        </form>
+                    </div>'
+                    ;
 
+                }
+            } else {
+                echo'<div class="alert alert-secondary" role="alert">
+                No products found matching this criteria!
+            </div>';
             }
 
             echo '</div></div></div>';
