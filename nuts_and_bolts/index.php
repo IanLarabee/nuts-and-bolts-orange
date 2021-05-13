@@ -111,7 +111,7 @@
                     echo '
                             <div class="carousel-item active">
                             '.(mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<input type="image" src="data:image/jpg;charset=utf8;base64,'.base64_encode($imgRow['imagedata']).'" class="d-block w-100 img-fluid py-1" style="height: 350px; width: 700px; object-fit: scale-down;" name="category[great_deal]" value="true">').'
-                                <div class="carousel-caption d-none d-md-block bg-light border-top" style="position: relative; left: 0; top: 0;">
+                                <div class="carousel-caption d-none d-sm-block bg-light border-top" style="position: relative; left: 0; top: 0;">
                                     <h4>Get this '.$row['product_name'].' for only </h4>
                                     <h3 class="text-success">$'.$row['price'].'</h3>
                                     <h5>along with other great deals!</h5>
@@ -132,7 +132,7 @@
                     echo '
                             <div class="carousel-item">
                             '.(mysqli_num_rows($imgResult) == 0 ? '<h5>Image Unavailable</h5>' : '<input type="image" src="data:image/jpg;charset=utf8;base64,'.base64_encode($imgRow['imagedata']).'" class="d-block w-100 img-fluid py-1" style="height: 350px; width: 700px; object-fit: scale-down;" name="category[great_deal]" value="true">').'
-                                <div class="carousel-caption d-none d-md-block bg-light border-top" style="position: relative; left: 0; top: 0;">
+                                <div class="carousel-caption d-none d-sm-block bg-light border-top" style="position: relative; left: 0; top: 0;">
                                     <h4>'.$row['product_name'].'</h4>
                                     <h5>Only</h5>
                                     <h3 class="text-success">$'.$row['price'].'</h3>
